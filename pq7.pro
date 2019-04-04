@@ -16,6 +16,7 @@ LIBS += "$${MYJSONLIB}/libs/mingw/*.a"
 INCLUDEPATH += "$${MYJSONLIB}/include"
 LIBS += -ljsoncpp
 
+CONFIG += c++17
 QT       += core gui
 
 # added by xeno: QT 5.x.x compile support
