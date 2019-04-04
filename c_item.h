@@ -27,8 +27,8 @@ public:
 
     int Grade();
 
-    t_pq_equip Type();
-    void setType(t_pq_equip eqType);
+    Equipment Type();
+    void setType(Equipment eqType);
 
     void setASlot(int slot);
     int getASlot();
@@ -50,14 +50,14 @@ public:
     void addOfMod();
     void addAdjMod();
 
-    void makeClosestGrade(t_pq_equip iType, int grade);
+    void makeClosestGrade(Equipment iType, int grade);
 
     void clear();
     QJsonObject save();
     void load(QJsonObject itemRoot);
 
 private:
-    t_pq_equip itemType;
+    Equipment itemType;
 
     QString basename;
     int     basegrade;

@@ -39,10 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow::initFrames();
 
     //set state must be after initPlayer (for canBuy.. to work)
-    if (! MainWindow::canBuyNewEq(pq_equip_any))
-        game->State = pq_state_heading_to_killing_fields;
-    else
-        game->State = pq_state_buying_new_equip;
+    if ( MainWindow::canBuyNewEq(Equipment::Any)) {
+        game->currentState = State::BuyingNewEquipment;
+    } else {
+        game->currentState = State::HeadingToKillingFields;
+    }
 
     // startup dialog
     Dialog_Opening startup;
@@ -81,25 +82,25 @@ void MainWindow::incr_pb_action_value()
     {
         ui->pb_action->setValue(value % ui->pb_action->maximum());
 
-        switch(game->State) {
-        case pq_state_reserved_1: break;;
-        case pq_state_heading_to_killing_fields: break;;
-        case pq_state_fight:
+        switch(game->currentState) {
+        case State::Reserved1: break;
+        case State::HeadingToKillingFields: break;
+        case State::Fighting:
             MainWindow::incr_pb_experience_value();
 
             MainWindow::incr_pb_quest_value();
 
             MainWindow::incr_pb_encumbrance_value();
             MainWindow::addMonDrop();
-            break;;
-        case pq_state_heading_to_town: break;;
-        case pq_state_selling_off:
+            break;
+        case State::HeadingToTown: break;
+        case State::SellingOff:
             MainWindow::rmInvItem();
             MainWindow::incr_pb_encumbrance_value();
-            break;;
-        case pq_state_buying_new_equip:
+            break;
+        case State::BuyingNewEquipment:
             MainWindow::buyNewEq();
-            break;;
+            break;
         }
 
         MainWindow::tranState();
@@ -189,7 +190,7 @@ void MainWindow::incr_pb_quest_value()
 void MainWindow::incr_pb_experience_value()
 {
 
-    if (game->State == pq_state_fight) {
+    if (game->currentState == State::Fighting) {
 
         // incr player xp
         game->Player->XP = game->Player->XP.number(game->Player->XP.toULongLong() + game->Monster->winXP());
@@ -309,39 +310,39 @@ QString MainWindow::randQuest()
 
         //      preamble
         switch (rand() % 3) {
-        case 1:  rtnQuest += "Quell the "; break;;
-        case 2:  rtnQuest += "Placate the "; break;;
+        case 1:  rtnQuest += "Quell the "; break;
+        case 2:  rtnQuest += "Placate the "; break;
         default: rtnQuest += "Hunt the ";
         }
 
         //      object
         cdata = gConfig->Monsters.at(rand() % gConfig->Monsters.size()).split("|");
         rtnQuest += cdata.at(0); // name
-        break;;
+        break;
 
     case 2:
         // Fetch quest
 
         //      preable
         switch (rand() % 4) {
-        case 1:  rtnQuest += "Deliver this "; break;;
-        case 2:  rtnQuest += "Collect payment for this "; break;;
-        case 3:  rtnQuest += "Hide this "; break;;
+        case 1:  rtnQuest += "Deliver this "; break;
+        case 2:  rtnQuest += "Collect payment for this "; break;
+        case 3:  rtnQuest += "Hide this "; break;
         default: rtnQuest += "Fetch my ";
         }
 
         //      object
         cdata << gConfig->BoringItems.at(rand() % gConfig->BoringItems.size());
         rtnQuest += cdata.at(0);
-        break;;
+        break;
 
     case 3:
         // Seek quest
 
         //      preamble
         switch (rand() % 3) {
-        case 1:  rtnQuest += "Inquire after the "; break;;
-        case 2:  rtnQuest += "Aspire for the "; break;;
+        case 1:  rtnQuest += "Inquire after the "; break;
+        case 2:  rtnQuest += "Aspire for the "; break;
         default: rtnQuest += "Seek you the ";
         }
 
@@ -351,7 +352,7 @@ QString MainWindow::randQuest()
             special.addAdjMod();
         }
         rtnQuest += special.Name();
-        break;;
+        break;
 
     default:
         rtnQuest = "?";
@@ -394,49 +395,49 @@ void MainWindow::addAct()
 void MainWindow::setAction()
 {
     game->Action.clear();
-    switch(game->State) {
-    case pq_state_reserved_1:
+    switch(game->currentState) {
+    case State::Reserved1:
         // reserved
-        break;;
-    case pq_state_heading_to_killing_fields:
-        // heading to killing feilds
-        game->Action = tr("Heading to the Killing Feilds");
+        break;
+    case State::HeadingToKillingFields:
+        // heading to killing fields
+        game->Action = tr("Heading to the Killing Fields");
         //pb_action_timer->setInterval(75);
         game->actionTime = 75;
-        break;;
-    case pq_state_fight:
+        break;
+    case State::Fighting:
         // fight
         MainWindow::setMonster();
         game->Action = tr("Executing ") +\
                 gConfig->Indefinite(game->Monster->Discription());
         game->actionTime = 50;
-        break;;
-    case pq_state_heading_to_town:
+        break;
+    case State::HeadingToTown:
         // back to Town
         game->Action = tr("Going back to Town to sell off");
         game->actionTime = 75;
-        break;;
-    case pq_state_selling_off:
+        break;
+    case State::SellingOff:
         // selling off
         game->Action = tr("Selling ") + MainWindow::sellInvItem();
         game->actionTime = 20;
-        break;;
-    case pq_state_buying_new_equip:
+        break;
+    case State::BuyingNewEquipment:
         // shopping!!
         game->Action = tr("Negotiating purchase of ") +
                 game->Player->purchType() +tr(" ") +
                 game->Player->Purchase->Name() + tr(" ");
         switch (game->Player->Purchase->Type()) {
-        case pq_equip_weapon:
-            game->Action += tr("(weapon)"); break;;
-        case pq_equip_shield:
-            game->Action += tr("(shield)"); break;;
-        case pq_equip_armor:
-            game->Action += tr("(armor)"); break;;
-        case pq_equip_any: break;;
+        case Equipment::Weapon:
+            game->Action += tr("(weapon)"); break;
+        case Equipment::Shield:
+            game->Action += tr("(shield)"); break;
+        case Equipment::Armoy:
+            game->Action += tr("(armor)"); break;
+        case Equipment::Any: break;
         }
         game->actionTime = 35;
-        break;;
+        break;
     default:
         game->Action = tr("You are lost in another plane of existance");
         game->actionTime = 1000;
@@ -452,34 +453,34 @@ void MainWindow::setAction()
 
 void MainWindow::tranState()
 {
-    switch (game->State) {
-    case pq_state_reserved_1:
-        game->State = pq_state_heading_to_killing_fields;
-        break;;
-    case pq_state_heading_to_killing_fields:
-        game->State = pq_state_fight;
-        break;;
-    case pq_state_fight:
+    switch (game->currentState) {
+    case State::Reserved1:
+        game->currentState = State::HeadingToKillingFields;
+        break;
+    case State::HeadingToKillingFields:
+        game->currentState = State::Fighting;
+        break;
+    case State::Fighting:
         if (game->Player->Encumbrance() > game->Player->maxEncumbrance())
-            game->State = pq_state_heading_to_town;
-        break;;
-    case pq_state_heading_to_town:
-        game->State = pq_state_selling_off;
-        break;;
-    case pq_state_selling_off:
+            game->currentState = State::HeadingToTown;
+        break;
+    case State::HeadingToTown:
+        game->currentState = State::SellingOff;
+        break;
+    case State::SellingOff:
         if (game->Player->Inventory.empty()) {
-            if (MainWindow::canBuyNewEq(pq_equip_any))
-                game->State = pq_state_buying_new_equip;
+            if (MainWindow::canBuyNewEq(Equipment::Any))
+                game->currentState = State::BuyingNewEquipment;
             else
-                game->State = pq_state_heading_to_killing_fields;
+                game->currentState = State::HeadingToKillingFields;
         }
-        break;;
-    case pq_state_buying_new_equip:
-        if (! MainWindow::canBuyNewEq(pq_equip_any))
-            game->State = pq_state_heading_to_killing_fields;
-        break;;
+        break;
+    case State::BuyingNewEquipment:
+        if (! MainWindow::canBuyNewEq(Equipment::Any))
+            game->currentState = State::HeadingToKillingFields;
+        break;
     default:
-        game->State = pq_state_reserved_1;
+        game->currentState = State::Reserved1;
     }
 
     MainWindow::setAction();
@@ -520,7 +521,7 @@ void MainWindow::addMonDrop()
         // create a monster drop item
         drop->setName(game->Monster->Drops().at(i));
         drop->Weight = 1;
-        drop->setType(pq_equip_any);
+        drop->setType(Equipment::Any);
         if (game->Monster->Level().toInt() < 0)
             drop->setPrice(0);
         else
@@ -666,7 +667,7 @@ void MainWindow::winSpells()
     MainWindow::updSpellTbl();
 }
 
-bool MainWindow::canBuyNewEq(t_pq_equip eqtype)
+bool MainWindow::canBuyNewEq(Equipment eqtype)
 {
     // chk for spend limit must populate Player's purchase item
     int spendCap = gConfig->fnPercent(game->Player->Gold, 40); // 40% total gold
@@ -674,24 +675,24 @@ bool MainWindow::canBuyNewEq(t_pq_equip eqtype)
     return (game->Player->Purchase->Appraisal() <= spendCap);
 }
 
-c_Item* MainWindow::getPurchaseItem(t_pq_equip eqtype)
+c_Item* MainWindow::getPurchaseItem(Equipment eqtype)
 {
-    c_Item* itemForPurchase;
-    t_pq_equip eqSelect = eqtype;
+    c_Item* itemForPurchase{};
+    Equipment eqSelect = eqtype;
     int pick(0);
 
     // randomize "any" type to weapon, shield, or armor
-    if (eqtype == pq_equip_any) {
+    if (eqtype == Equipment::Any) {
         int r = rand() % 11; // total peices of eq
-        if      (r == 0) eqSelect = pq_equip_weapon;
-        else if (r == 1) eqSelect = pq_equip_shield;
-        else eqSelect = pq_equip_armor;
+        if      (r == 0) eqSelect = Equipment::Weapon;
+        else if (r == 1) eqSelect = Equipment::Shield;
+        else eqSelect = Equipment::Armoy;
     }
 
     // set item to purchase (slot used for armor slots)
     switch(eqSelect) {
 
-    case pq_equip_weapon:
+    case Equipment::Weapon:
         // if not filled - buy first one
         if (game->Player->Weapon->Name() == tr("") ) {
             itemForPurchase = game->makeEqByGrade(eqSelect, -4);
@@ -703,11 +704,11 @@ c_Item* MainWindow::getPurchaseItem(t_pq_equip eqtype)
             itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Weapon->Grade());
             game->Player->setPurchNew(false);
         }
-        break;;
+        break;
 
-    case pq_equip_shield:
+    case Equipment::Shield:
         if (game->Player->Sheild->Name() == tr("")) {
-            itemForPurchase = game->makeEqByGrade(pq_equip_shield, game->Player->Level.toInt());
+            itemForPurchase = game->makeEqByGrade(Equipment::Shield, game->Player->Level.toInt());
             game->Player->setPurchNew(true);
         }
         else
@@ -715,14 +716,14 @@ c_Item* MainWindow::getPurchaseItem(t_pq_equip eqtype)
             itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Sheild->Grade());
             game->Player->setPurchNew(false);
         }
-        break;;
-    case pq_equip_armor:
+        break;
+    case Equipment::Armoy:
 
         // pick random armor
         pick = rand() % game->Player->Armor.size();
 
         if (game->Player->Armor.at(pick)->Name() == tr("")){
-            itemForPurchase = game->makeEqByGrade(pq_equip_armor, game->Player->Level.toInt());
+            itemForPurchase = game->makeEqByGrade(Equipment::Armoy, game->Player->Level.toInt());
             itemForPurchase->setASlot(pick);
             game->Player->setPurchNew(true);
         }
@@ -732,9 +733,10 @@ c_Item* MainWindow::getPurchaseItem(t_pq_equip eqtype)
             itemForPurchase->setASlot(pick);
             game->Player->setPurchNew(false);
         }
-        break;;
-    case pq_equip_any:
-        break;;
+        break;
+    case Equipment::Any:
+        Q_ASSERT(false);
+        return nullptr;
     }
     return itemForPurchase;
 }
@@ -746,21 +748,21 @@ void MainWindow::buyNewEq()
 
     // drop old and equip new
     switch(game->Player->Purchase->Type()) {
-    case pq_equip_weapon:
+    case Equipment::Weapon:
         delete game->Player->Weapon;
         game->Player->Weapon = game->Player->Purchase;
-        break;;
-    case pq_equip_shield:
+        break;
+    case Equipment::Shield:
         delete game->Player->Sheild;
         game->Player->Sheild = game->Player->Purchase;
         break;
-    case pq_equip_armor:
+    case Equipment::Armoy:
         delete game->Player->Armor[game->Player->Purchase->getASlot()];
         game->Player->Armor[game->Player->Purchase->getASlot()] = game->Player->Purchase;
-        break;;
-    case pq_equip_any:
+        break;
+    case Equipment::Any:
         //fault - shouldn't happen
-        break;;
+        break;
     }
 
     //delete game->Player->Purchase;
@@ -770,26 +772,26 @@ void MainWindow::buyNewEq()
 }
 
 
-c_Item* MainWindow::upgradeEq(t_pq_equip eqtype, int grade)
+c_Item* MainWindow::upgradeEq(Equipment eqtype, int grade)
 {
     c_Item* equip = new c_Item;
-    t_pq_equip eqSelect = eqtype;
+    Equipment eqSelect = eqtype;
 
-    if (eqSelect == pq_equip_any)
-        eqSelect = static_cast<t_pq_equip>(rand() % 3);
+    if (eqSelect == Equipment::Any)
+        eqSelect = Equipment(rand() % 3);
 
     switch (eqSelect) {
-    case pq_equip_weapon:
+    case Equipment::Weapon:
         equip = game->makeEqByGrade(eqSelect, grade + 1);
-        break;;
-    case pq_equip_shield:
+        break;
+    case Equipment::Shield:
         equip = game->makeEqByGrade(eqSelect, grade + 1);
-        break;;
-    case pq_equip_armor:
+        break;
+    case Equipment::Armoy:
         equip = game->makeEqByGrade(eqSelect, grade + 1);
-        break;;
-    case pq_equip_any:
-        break;;
+        break;
+    case Equipment::Any:
+        break;
     }
     return equip;
 }

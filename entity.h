@@ -73,7 +73,6 @@ private:
 
     // methods
     QString statRand(int basevalue, int offset);
-    int fnFib(int value);
 
     // save / load helper
     QJsonArray spellListToArray(QList<c_Spell *> &list);

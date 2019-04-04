@@ -373,13 +373,7 @@ QString c_Config::fnInterpStr(QString pattern, QString interpolation)
       This takes patterns such as "* whatever" and converts the '*'
       into the interpolation string
       */
-    QStringList tmp;
-    tmp = pattern.split("*");
-
-    // find empty and put interp into it
-    if (tmp.at(0) == "") tmp[0] = interpolation;
-    else tmp[1] = interpolation;
-
-    return tmp.at(0) + tmp.at(1);
+    pattern.replace("*", interpolation);
+    return pattern;
 }
 

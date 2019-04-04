@@ -5,12 +5,12 @@
 #include <QString>
 #include <QObject>
 
-typedef enum {
-    pq_equip_weapon,
-    pq_equip_shield,
-    pq_equip_armor,
-    pq_equip_any
-} t_pq_equip;
+enum class Equipment {
+    Weapon,
+    Shield,
+    Armoy,
+    Any
+};
 
 class c_Config
 {

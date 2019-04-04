@@ -16,7 +16,7 @@ void c_Item::clear()
     modprefix.clear();
     itemBonus = 0;
     Weight =0;
-    itemType = pq_equip_any;
+    itemType = Equipment::Any;
     price = 0;
     armorSlot = 0;
 }
@@ -96,9 +96,9 @@ int c_Item::Appraisal()
 //        else if (itemType == pq_equip_shield) factor += 6;
 //        else if (itemType == pq_equip_armor)  factor += 7;
 
-        if      (itemType == pq_equip_weapon) factor += 18;
-        else if (itemType == pq_equip_shield) factor += 26;
-        else if (itemType == pq_equip_armor)  factor += 22;
+        if      (itemType == Equipment::Weapon) factor += 18;
+        else if (itemType == Equipment::Shield) factor += 26;
+        else if (itemType == Equipment::Armoy)  factor += 22;
 
         // set price
         price = g * factor;
@@ -132,12 +132,12 @@ int c_Item::Grade()
     return g;
 }
 
-t_pq_equip c_Item::Type()
+Equipment c_Item::Type()
 {
     return itemType;
 }
 
-void c_Item::setType(t_pq_equip eqType)
+void c_Item::setType(Equipment eqType)
 {
     itemType = eqType;
 }
@@ -161,7 +161,7 @@ void c_Item::makeWeapon()
     basename  = cdata.at(0);            //name
     basegrade = cdata.at(1).toInt();    //value
     Weight = 1;
-    itemType = pq_equip_weapon;
+    itemType = Equipment::Weapon;
 }
 
 void c_Item::addWeaponMod()
@@ -189,7 +189,7 @@ void c_Item::makeSheild()
     basename  = cdata.at(0);            //name
     basegrade = cdata.at(1).toInt();    //value
     Weight = 1;
-    itemType = pq_equip_shield;
+    itemType = Equipment::Shield;
 }
 
 void c_Item::makeArmor()
@@ -199,7 +199,7 @@ void c_Item::makeArmor()
     basename  = cdata.at(0);            //name
     basegrade = cdata.at(1).toInt();    //value
     Weight = 1;
-    itemType = pq_equip_armor;
+    itemType = Equipment::Armoy;
 }
 
 void c_Item::addDefMod()
@@ -226,7 +226,7 @@ void c_Item::makeBitem()
     basename = gConfig->BoringItems.at(rand() % gConfig->BoringItems.size());
     basegrade = 1;
     Weight = 1;
-    itemType = pq_equip_any;
+    itemType = Equipment::Any;
 }
 
 void c_Item::makeSpecial()
@@ -235,7 +235,7 @@ void c_Item::makeSpecial()
     //basegrade = 25 + (rand() % 20 - 10); // [15..34]
     basegrade = 15 + (rand() % 20 - 10); // [5..19]
     Weight = 1;
-    itemType = pq_equip_any;
+    itemType = Equipment::Any;
 }
 
 void c_Item::addOfMod()
@@ -255,28 +255,29 @@ void c_Item::addAdjMod()
     modprefix << true;
 }
 
-void c_Item::makeClosestGrade(t_pq_equip iType, int grade)
+void c_Item::makeClosestGrade(Equipment iType, int grade)
 {
     QStringList* itemList;
-    t_pq_equip eqSelect = iType;
+    Equipment eqSelect = iType;
 
     // handle "any" selection
-    if (eqSelect == pq_equip_any)
-        eqSelect = static_cast<t_pq_equip>(rand() % 3); //random type
+    if (eqSelect == Equipment::Any) {
+        eqSelect = Equipment(rand() % 3); //random type
+    }
 
     // choose list by type
     switch(eqSelect) {
-    case pq_equip_weapon:
+    case Equipment::Weapon:
         itemList = &gConfig->Weapons;
         break;
-    case pq_equip_shield:
+    case Equipment::Shield:
         itemList = &gConfig->Shields;
         break;
-    case pq_equip_armor:
+    case Equipment::Armoy:
         itemList = &gConfig->Armors;
         break;
-    case pq_equip_any:
-        break;
+    case Equipment::Any:
+        return;
     }
 
     bool found(false);
@@ -371,7 +372,7 @@ QJsonObject c_Item::save()
 void c_Item::load(QJsonObject itemRoot)
 {
     //t_pq_equip itemType;
-    itemType = t_pq_equip(itemRoot["Type"].toInt());
+    itemType = Equipment(itemRoot["Type"].toInt());
 
     //QString basename;
     //int     basegrade;

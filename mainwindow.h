@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 
@@ -51,9 +51,9 @@ private:
     void rmInvItem();
 
     void buyNewEq();
-    bool canBuyNewEq(t_pq_equip eqtype);
-    c_Item *getPurchaseItem(t_pq_equip eqtype);
-    c_Item* upgradeEq(t_pq_equip eqtype , int grade);
+    bool canBuyNewEq(Equipment eqtype);
+    c_Item *getPurchaseItem(Equipment eqtype);
+    c_Item* upgradeEq(Equipment eqtype , int grade);
 
     void winStats();
     void winSpells();

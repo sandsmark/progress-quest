@@ -12,7 +12,7 @@ c_World::c_World(QObject *parent) :
     Monster = new c_Monster;
     Act = 0;
     Action  = "";
-    State = pq_state_reserved_1;
+    currentState = State::Reserved1;
     pb_action = 0;
     pb_encumbrance = 0;
     pb_experience = 0;
@@ -50,7 +50,7 @@ void c_World::initPlayer()
     Player->Spells.append(spell);
 
     // add starting weapon (a weak one =D )
-    Player->Weapon = c_World::makeEqByGrade(pq_equip_weapon, -4);
+    Player->Weapon = c_World::makeEqByGrade(Equipment::Weapon, -4);
 
     // Look ma, no sheild!
     Player->Sheild = new c_Item;
@@ -64,7 +64,7 @@ void c_World::initPlayer()
         index = rand() % Player->Armor.size();
         if (Player->Armor.at(index)->Name() == tr("")) {
             delete Player->Armor[index];
-            Player->Armor[index] = c_World::makeEqByGrade(pq_equip_armor, -2);
+            Player->Armor[index] = c_World::makeEqByGrade(Equipment::Armoy, -2);
             i++;
         }
     } while (i < 2);
@@ -73,7 +73,7 @@ void c_World::initPlayer()
     Player->Gold = 25;
 }
 
-c_Item* c_World::makeEqByGrade(t_pq_equip eqtype, int grade)
+c_Item* c_World::makeEqByGrade(Equipment eqtype, int grade)
 /*
  *      Make Equipment By Grade
  *
@@ -86,16 +86,16 @@ c_Item* c_World::makeEqByGrade(t_pq_equip eqtype, int grade)
  */
 {
     c_Item* equip = new c_Item;
-    t_pq_equip eqSelect = eqtype;
+    Equipment eqSelect = eqtype;
 
     // handle "any" type
-    if (eqSelect == pq_equip_any)
-        eqSelect = static_cast<t_pq_equip>(rand() % 3);
+    if (eqSelect == Equipment::Any)
+        eqSelect = Equipment(rand() % 3);
 
     // main types
     switch(eqSelect) {
 
-    case pq_equip_weapon:
+    case Equipment::Weapon:
 
         equip->makeClosestGrade(eqSelect, grade);
 
@@ -112,7 +112,7 @@ c_Item* c_World::makeEqByGrade(t_pq_equip eqtype, int grade)
 
         break;
 
-    case pq_equip_shield:
+    case Equipment::Shield:
 
         equip->makeClosestGrade(eqSelect, grade);
 
@@ -129,7 +129,7 @@ c_Item* c_World::makeEqByGrade(t_pq_equip eqtype, int grade)
 
         break;
 
-    case pq_equip_armor:
+    case Equipment::Armoy:
 
         equip->makeClosestGrade(eqSelect, grade);
 
@@ -146,7 +146,7 @@ c_Item* c_World::makeEqByGrade(t_pq_equip eqtype, int grade)
 
         break;
 
-    case pq_equip_any:
+    case Equipment::Any:
         break;
     }
 
@@ -176,7 +176,7 @@ void c_World::save(QString filename)
     world["Act"] = Act;
     world["Action"] = Action;
     world["ActionTime"] = actionTime;
-    world["State"] = (int)State;
+    world["State"] = int(currentState);
 
     /*
         int pb_action;
@@ -268,7 +268,7 @@ void c_World::load(QJsonObject root)
     Act     = root["Act"].toInt(99);
     Action  = root["Action"].toString("Knock knock...");
     actionTime = root["ActionTime"].toInt(50);
-    State   = t_pq_state(root["State"].toInt());
+    currentState   = State(root["State"].toInt());
 
     /*
     quint32 debug

@@ -97,7 +97,7 @@ QString Entity::nameRand()
         build += nameparts.at(rand() % nameparts.size());
     }
 
-    build = build.left(1).toUpper()+build.mid(1);
+    build[0] = build[0].toUpper();
 
     return build;
 }
@@ -116,43 +116,9 @@ QString Entity::vocRand()
     return cdata.at(0); // class name
 }
 
-int Entity::fnFib(int value)
-{
-    // sanity
-    if (value < 1) return 0;
-
-    QList<int> build;
-
-    // seed fibonacci seq (first 3)
-    build.clear();
-    build.append(0);
-    build.append(1);
-    build.append(1);
-
-    // first 3 values already figured
-    if (value <= 3) {
-        return build.at(value - 1);
-    }
-    else
-    {
-        // calculate 4 and higher
-        for (int i(3); i <= value; i++)
-        {
-            // exchange down
-            build[0] = build.at(1);
-            build[1] = build.at(2);
-
-            // new value (f(n) = f(n-1) + f(n-2))
-            build[2] = build.at(1) + build.at(0);
-        }
-     }
-
-    return build.at(2);
-}
-
 void Entity::incrLevel()
 {
-    XP = tr("0");
+    XP = "0";
     Level = QString().number(Level.toInt() + 1);
 }
 

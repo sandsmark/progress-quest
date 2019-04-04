@@ -23,20 +23,21 @@ typedef enum {
     pq_debug_active                     = 1 << 15
 } t_pq_debug;
 
-typedef enum {
-    pq_state_reserved_1,
-    pq_state_heading_to_killing_fields,
-    pq_state_fight,
-    pq_state_heading_to_town,
-    pq_state_selling_off,
-    pq_state_buying_new_equip
-} t_pq_state;
+
+enum class State {
+    Reserved1,
+    HeadingToKillingFields,
+    Fighting,
+    HeadingToTown,
+    SellingOff,
+    BuyingNewEquipment
+};
 
 class c_World : public QObject
 {
     Q_OBJECT
 public:
-    explicit c_World(QObject *parent = 0);
+    explicit c_World(QObject *parent = nullptr);
 
     /*
      *      Player instance - gamewide
@@ -53,7 +54,7 @@ public:
      */
     int Act;
     QString Action;
-    t_pq_state State;
+    State currentState;
 
     /*
      *      Progress Bar values
@@ -82,7 +83,7 @@ public:
     /*
      *    Public Methods
      */
-    c_Item* makeEqByGrade(t_pq_equip eqtype , int grade);
+    c_Item* makeEqByGrade(Equipment eqtype , int grade);
     void initPlayer();
 
     bool isDebugFlagSet(t_pq_debug flag);
