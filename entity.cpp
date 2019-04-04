@@ -1,4 +1,7 @@
 #include "entity.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 Entity::Entity(QObject *parent) :
     QObject(parent)
@@ -153,130 +156,131 @@ void Entity::incrLevel()
     Level = QString().number(Level.toInt() + 1);
 }
 
-Json::Value Entity::save()
+QJsonObject Entity::save()
 {
-    Json::Value root;
+//    Json::Value root;
+    QJsonObject entity;
     std::string mKey = "Entity";
     /*
     QString Name, Race, Voc, Level;
     */
-    root[mKey]["Name"] = Name.toStdString();
-    root[mKey]["Race"] = Race.toStdString();
-    root[mKey]["Class"] = Voc.toStdString();
-    root[mKey]["Level"] = Level.toStdString();
+    entity["Name"] = Name;
+    entity["Race"] = Race;
+    entity["Class"] = Voc;
+    entity["Level"] = Level;
     /*
     QString STR, INT, WIS, DEX, CON, CHA, HPMax, MPMax;
     */
-    root[mKey]["STR"] = STR.toStdString();
-    root[mKey]["INT"] = INT.toStdString();
-    root[mKey]["WIS"] = WIS.toStdString();
-    root[mKey]["DEX"] = DEX.toStdString();
-    root[mKey]["CON"] = CON.toStdString();
-    root[mKey]["CHA"] = CHA.toStdString();
-    root[mKey]["HPMax"] = HPMax.toStdString();
-    root[mKey]["MPMax"] = MPMax.toStdString();
+    entity["STR"] = STR;
+    entity["INT"] = INT;
+    entity["WIS"] = WIS;
+    entity["DEX"] = DEX;
+    entity["CON"] = CON;
+    entity["CHA"] = CHA;
+    entity["HPMax"] = HPMax;
+    entity["MPMax"] = MPMax;
     /*
     QString XP;
     */
-    root[mKey]["XP"] = XP.toStdString();
+    entity["XP"] = XP;
 
     /*
     QList<c_Spell*> Spells;
     */
-    root[mKey]["Spells"] = Entity::spellListToArray(Spells);
+    entity["Spells"] = Entity::spellListToArray(Spells);
 
     /*
     c_Item*         Weapon;
     c_Item*         Sheild;
     QList<c_Item*>  Armor;
     */
-    root[mKey]["Weapon"] = Weapon->save();
-    root[mKey]["Sheild"] = Sheild->save();
-    root[mKey]["Armor"] = Entity::itemListToArray(Armor);
+    entity["Weapon"] = Weapon->save();
+    entity["Sheild"] = Sheild->save();
+    entity["Armor"] = Entity::itemListToArray(Armor);
 
     /*
     QList<c_Item*> Inventory;
     QList<int> Quantity;
     */
-    root[mKey]["Inventory"] = Entity::invListToArray(Inventory, Quantity);
+    entity["Inventory"] = Entity::invListToArray(Inventory, Quantity);
 
     /*
     int Gold;
     */
-    root[mKey]["Gold"] = Gold;
+    entity["Gold"] = Gold;
 
+    QJsonObject root;
+    root["Entity"] = entity;
     return root;
 }
 
-void Entity::load(Json::Value entityRoot)
+void Entity::load(QJsonObject entityRoot)
 {
     // unpack entity values
-    entityRoot = entityRoot.get("Entity", Json::objectValue);
+    entityRoot = entityRoot["Entity"].toObject();
 
     /*
     QString Name, Race, Voc, Level;
     */
-    Name = QString::fromStdString(entityRoot.get("Name", "").asString());
-    Race = QString::fromStdString(entityRoot.get("Race", "").asString());
-    Voc = QString::fromStdString(entityRoot.get("Class", "").asString());
-    Level = QString::fromStdString(entityRoot.get("Level", "").asString());
+    Name = entityRoot["Name"].toString();
+    Race = entityRoot["Race"].toString();
+    Voc = entityRoot["Class"].toString();
+    Level = entityRoot["Level"].toString();
     /*
     QString STR, INT, WIS, DEX, CON, CHA, HPMax, MPMax;
     */
-    STR = QString::fromStdString(entityRoot.get("STR", "").asString());
-    INT = QString::fromStdString(entityRoot.get("INT", "").asString());
-    WIS = QString::fromStdString(entityRoot.get("WIS", "").asString());
-    DEX = QString::fromStdString(entityRoot.get("DEX", "").asString());
-    CON = QString::fromStdString(entityRoot.get("CON", "").asString());
-    CHA = QString::fromStdString(entityRoot.get("CHA", "").asString());
-    HPMax = QString::fromStdString(entityRoot.get("HPMax", "").asString());
-    MPMax = QString::fromStdString(entityRoot.get("MPMax", "").asString());
+    STR = entityRoot["STR"].toString();
+    INT = entityRoot["INT"].toString();
+    WIS = entityRoot["WIS"].toString();
+    DEX = entityRoot["DEX"].toString();
+    CON = entityRoot["CON"].toString();
+    CHA = entityRoot["CHA"].toString();
+    HPMax = entityRoot["HPMax"].toString();
+    MPMax = entityRoot["MPMax"].toString();
 
     /*
     QString XP;
     */
-    XP = QString::fromStdString(entityRoot.get("XP", "").asString());
+    XP = entityRoot["XP"].toString();
 
     /*
     QList<c_Spell*> Spells;
     */
-    Spells = Entity::arrayToSpellList(entityRoot.get("Spells", Json::arrayValue));
+    Spells = Entity::arrayToSpellList(entityRoot["Spells"].toArray());
 
     /*
     c_Item*         Weapon;
     c_Item*         Sheild;
     QList<c_Item*>  Armor;
     */
-    Weapon->load(entityRoot.get("Weapon",Json::arrayValue));
-    Sheild->load(entityRoot.get("Sheild",Json::arrayValue));
-    Armor = Entity::arrayToItemList(entityRoot.get("Armor",Json::arrayValue));
+    Weapon->load(entityRoot["Weapon"].toObject());
+    Sheild->load(entityRoot["Sheild"].toObject());
+    Armor = Entity::arrayToItemList(entityRoot["Armor"].toArray());
 
     /*
     QList<c_Item*> Inventory;
     QList<int> Quantity;
     */
-    Entity::arrayToInvList(entityRoot.get("Inventory",Json::arrayValue), Inventory, Quantity);
+    Entity::arrayToInvList(entityRoot["Inventory"].toArray(), Inventory, Quantity);
 
     /*
     int Gold;
     */
-    Gold = entityRoot.get("Gold", 0).asInt();
+    Gold = entityRoot["Gold"].toInt();
 }
 
-Json::Value Entity::spellListToArray(QList<c_Spell *> &list)
+QJsonArray Entity::spellListToArray(QList<c_Spell *> &list)
 {
-    Json::Value array;
-    array.clear();
+    QJsonArray array;
     for (int i=0; i < list.size(); i++){
         array.append(list.at(i)->save());
     }
     return array;
 }
 
-Json::Value Entity::itemListToArray(QList<c_Item *> &list)
+QJsonArray Entity::itemListToArray(QList<c_Item *> &list)
 {
-    Json::Value array;
-    array.clear();
+    QJsonArray array;
     for (int i=0; i < list.size(); i++)
     {
         array.append(list.at(i)->save());
@@ -284,15 +288,11 @@ Json::Value Entity::itemListToArray(QList<c_Item *> &list)
     return array;
 }
 
-Json::Value Entity::invListToArray(QList<c_Item *> &iList, QList<int> &nList)
+QJsonArray Entity::invListToArray(QList<c_Item *> &iList, QList<int> &nList)
 {
-
-    Json::Value array, pair;
-    array.clear();
-    for (int i=0; i < iList.size(); i++)
-    {
-        pair.clear();
-
+    QJsonArray array;
+    for (int i=0; i < iList.size(); i++) {
+        QJsonArray pair;
         pair.append(iList.at(i)->save());
         pair.append(nList.at(i));
 
@@ -301,43 +301,40 @@ Json::Value Entity::invListToArray(QList<c_Item *> &iList, QList<int> &nList)
     return array;
 }
 
-QList<c_Spell *> Entity::arrayToSpellList(Json::Value array)
+QList<c_Spell *> Entity::arrayToSpellList(QJsonArray array)
 {
     QList<c_Spell *> list;
-    for (Json::Value::ArrayIndex i=0; i < array.size(); i++)
+    for (int i=0; i < array.size(); i++)
     {
         list.append(new c_Spell);
-        list.at(list.size() - 1)->load(array.get(i, Json::objectValue));
+        list.at(list.size() - 1)->load(array[i].toObject());
     }
     return list;
 }
 
-QList<c_Item *> Entity::arrayToItemList(Json::Value array)
+QList<c_Item *> Entity::arrayToItemList(QJsonArray array)
 {
     QList<c_Item *> list;
-    for (Json::Value::ArrayIndex i=0; i < array.size(); i++)
+    for (int i=0; i < array.size(); i++)
     {
         list.append(new c_Item);
-        list.at(list.size() - 1)->load(array.get(i, Json::objectValue));
+        list.at(list.size() - 1)->load(array[i].toObject());
     }
     return list;
 }
 
-void Entity::arrayToInvList(Json::Value array, QList<c_Item *> &iList, QList<int> &nList)
+void Entity::arrayToInvList(QJsonArray array, QList<c_Item *> &iList, QList<int> &nList)
 {
-    Json::Value pair;
-    pair.clear();
-
     iList.clear();
     nList.clear();
 
-    for (Json::Value::ArrayIndex i=0; i < array.size(); i++)
+    for (int i=0; i < array.size(); i++)
     {
-        pair = array.get(i, Json::arrayValue);
+        QJsonArray pair = array[i].toArray();
 
         iList.append(new c_Item);
-        iList.at(iList.size() - 1)->load(pair.get((Json::Value::ArrayIndex)0,Json::objectValue));
+        iList.at(iList.size() - 1)->load(pair[i].toObject());
 
-        nList.append(pair.get((Json::Value::ArrayIndex)1, 0).asInt());
+        nList.append(pair[1].toInt());
     }
 }

@@ -9,8 +9,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "json/json.h"
-
 class c_Monster : public QObject
 {
     Q_OBJECT
@@ -42,8 +40,8 @@ public:
     bool isSpecial;
 
     void clear();
-    Json::Value save();
-    void load(Json::Value monsterRoot);
+    QJsonObject save();
+    void load(QJsonObject monsterRoot);
 
 signals:
     
@@ -71,10 +69,10 @@ private:
     QStringList pickSpcByLevel(int level);
 
     // save / load helpers
-    Json::Value modListToArray(QStringList &mList, QList<int> &vList);
-    Json::Value dropListToArray(QStringList &list);
-    void arrayToModList(Json::Value array, QStringList &mList, QList<int> &vList);
-    QStringList arrayToDropList(Json::Value array);
+    QJsonArray modListToArray(QStringList &mList, QList<int> &vList);
+    QJsonArray dropListToArray(QStringList &list);
+    void arrayToModList(QJsonArray array, QStringList &mList, QList<int> &vList);
+    QStringList arrayToDropList(QJsonArray array);
 
 };
 

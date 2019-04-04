@@ -8,8 +8,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "json/json.h"
-
 class c_Item
 {
 public:
@@ -55,8 +53,8 @@ public:
     void makeClosestGrade(t_pq_equip iType, int grade);
 
     void clear();
-    Json::Value save();
-    void load(Json::Value itemRoot);
+    QJsonObject save();
+    void load(QJsonObject itemRoot);
 
 private:
     t_pq_equip itemType;
@@ -75,8 +73,8 @@ private:
     int armorSlot;
 
     // save / load helpers
-    Json::Value modListToArray(QStringList &mList, QList<bool> &pList, QList<int> &gList);
-    void arrayToModList(Json::Value array, QStringList &mList, QList<bool> &pList, QList<int> &gList);
+    QJsonArray modListToArray(QStringList &mList, QList<bool> &pList, QList<int> &gList);
+    void arrayToModList(QJsonArray array, QStringList &mList, QList<bool> &pList, QList<int> &gList);
 
 };
 

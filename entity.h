@@ -11,8 +11,6 @@
 #include <QObject>
 #include <QString>
 
-#include "json/json.h"
-
 class Entity : public QObject
 {
     Q_OBJECT
@@ -60,8 +58,8 @@ public:
     QString vocRand();
     void incrLevel();
 
-    Json::Value save();
-    void load(Json::Value entityRoot);
+    QJsonObject save();
+    void load(QJsonObject entityRoot);
 
 signals:
     void levelUp();
@@ -78,13 +76,13 @@ private:
     int fnFib(int value);
 
     // save / load helper
-    Json::Value spellListToArray(QList<c_Spell *> &list);
-    Json::Value itemListToArray(QList<c_Item *> &list);
-    Json::Value invListToArray(QList<c_Item *> &iList, QList<int> &nList);
+    QJsonArray spellListToArray(QList<c_Spell *> &list);
+    QJsonArray itemListToArray(QList<c_Item *> &list);
+    QJsonArray invListToArray(QList<c_Item *> &iList, QList<int> &nList);
 
-    QList<c_Spell *> arrayToSpellList(Json::Value array);
-    QList<c_Item *> arrayToItemList(Json::Value array);
-    void arrayToInvList(Json::Value array, QList<c_Item *> &iList, QList<int> &nList);
+    QList<c_Spell *> arrayToSpellList(QJsonArray array);
+    QList<c_Item *> arrayToItemList(QJsonArray array);
+    void arrayToInvList(QJsonArray array, QList<c_Item *> &iList, QList<int> &nList);
 };
 
 #endif // ENTITY_H

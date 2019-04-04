@@ -1,5 +1,7 @@
 #include "c_spell.h"
 
+#include <QJsonObject>
+
 // default constr
 c_Spell::c_Spell()
 {
@@ -70,16 +72,16 @@ QString c_Spell::Level()
     return gConfig->toRoman(levelValue);
 }
 
-Json::Value c_Spell::save()
+QJsonObject c_Spell::save()
 {
-    Json::Value root;
-    root["NameIndex"] = nameIndex;
-    root["Level"] = levelValue;
-    return root;
+    QJsonObject spell;
+    spell["NameIndex"] = nameIndex;
+    spell["Level"] = levelValue;
+    return spell;
 }
 
-void c_Spell::load(Json::Value root)
+void c_Spell::load(QJsonObject root)
 {
-    nameIndex = root["NameIndex"].asInt();
-    levelValue = root["Level"].asInt();
+    nameIndex = root["NameIndex"].toInt();
+    levelValue = root["Level"].toInt();
 }

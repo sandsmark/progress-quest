@@ -1,4 +1,6 @@
 #include "c_monster.h"
+#include <QJsonObject>
+#include <QJsonArray>
 
 c_Monster::c_Monster(QObject *parent) :
     QObject(parent)
@@ -393,15 +395,15 @@ bool c_Monster::makeGroup(int level)
     return found;
 }
 
-Json::Value c_Monster::save()
+QJsonObject c_Monster::save()
 {
-    Json::Value root; // Json::objectValue
+    QJsonObject root; // Json::objectValue
 
     /*
     QString monster_race;
     int monster_level;
     */
-    root["Race"] = monster_race.toStdString();
+    root["Race"] = monster_race;
     root["Level"] = monster_level;
 
     /*
@@ -422,15 +424,15 @@ Json::Value c_Monster::save()
     QString level;
     qulonglong awardXP;
     */
-    root["Discription"] = discription.toStdString();
-    root["EffectiveLevel"] = level.toStdString();
+    root["Discription"] = discription;
+    root["EffectiveLevel"] = level;
     // attempt qulonglong to string convert
-    root["AwardXP"] = QString::number(awardXP).toStdString();
+    root["AwardXP"] = QString::number(awardXP);
 
     return root;
 }
 
-void c_Monster::load(Json::Value monsterRoot)
+void c_Monster::load(QJsonObject monsterRoot)
 {
     //QVariant<QString> var;
 
@@ -438,40 +440,38 @@ void c_Monster::load(Json::Value monsterRoot)
     QString monster_race;
     int monster_level;
     */
-    monster_race = QString::fromStdString(monsterRoot.get("Race", "").asString());
-    monster_level = monsterRoot.get("Level", 0).asInt();
+    monster_race = monsterRoot["Race"].toString();
+    monster_level = monsterRoot["Level"].toInt();
     /*
     QStringList mods;
     QList<int> mod_values;
     */
-    c_Monster::arrayToModList(monsterRoot.get("Modifiers", Json::objectValue), mods, mod_values);
+    c_Monster::arrayToModList(monsterRoot["Modifiers"].toArray(), mods, mod_values);
 
     /*
     QStringList drops;
     bool dropsFormatted;
     */
-    drops = c_Monster::arrayToDropList(monsterRoot.get("Drops", Json::objectValue));
+    drops = c_Monster::arrayToDropList(monsterRoot["Drops"].toArray());
 
     /*
     QString discription;
     QString level;
     qulonglong awardXP;
     */
-    discription = QString::fromStdString(monsterRoot.get("Discription", "").asString());
-    level = QString::fromStdString(monsterRoot.get("EffectiveLevel", "").asString());
+    discription = monsterRoot["Discription"].toString();
+    level = monsterRoot["EffectiveLevel"].toString();
     // attempt string to qulonglong convert
-    awardXP = QString::fromStdString(monsterRoot.get("AwardXP", "0").asString()).toULongLong();
+    awardXP = monsterRoot["AwardXP"].toString().toULongLong();
 }
 
-Json::Value c_Monster::modListToArray(QStringList &mList, QList<int> &vList)
+QJsonArray c_Monster::modListToArray(QStringList &mList, QList<int> &vList)
 {
-    Json::Value array, pair;
-    array.clear();
+    QJsonArray array;
     for (int i=0; i < mList.size(); i++)
     {
-        pair.clear();
-
-        pair.append(mList.at(i).toStdString());
+        QJsonArray pair;
+        pair.append(mList.at(i));
         pair.append(vList.at(i));
 
         array.append(pair);
@@ -479,40 +479,34 @@ Json::Value c_Monster::modListToArray(QStringList &mList, QList<int> &vList)
     return array;
 }
 
-Json::Value c_Monster::dropListToArray(QStringList &list)
+QJsonArray c_Monster::dropListToArray(QStringList &list)
 {
-    Json::Value array;
-    array.clear();
+    QJsonArray array;
     for (int i=0; i < list.size(); i++)
     {
-        array.append(list.at(i).toStdString());
+        array.append(list.at(i));
     }
     return array;
 }
 
-void c_Monster::arrayToModList(Json::Value array, QStringList &mList, QList<int> &vList)
+void c_Monster::arrayToModList(QJsonArray array, QStringList &mList, QList<int> &vList)
 {
-    Json::Value pair;
-    Json::Value::ArrayIndex i;
-    for (i=0; i < array.size(); i++)
+    for (int i=0; i < array.size(); i++)
     {
-        pair.clear();
-
-        pair = array.get(i,Json::arrayValue);
-        mList.append(QString::fromStdString(pair.get((Json::Value::ArrayIndex)0,"").asString()));
-        vList.append(pair.get((Json::Value::ArrayIndex)1,0).asInt());
+        QJsonArray pair = array[i].toArray();
+        mList.append(pair[0].toString());
+        vList.append(pair[1].toInt());
     }
 }
 
-QStringList c_Monster::arrayToDropList(Json::Value array)
+QStringList c_Monster::arrayToDropList(QJsonArray array)
 {
-    Json::Value::ArrayIndex i;
     QStringList list;
     list.clear();
 
-    for(i=0; i < array.size(); i++)
+    for(int i=0; i < array.size(); i++)
     {
-        list.append(QString::fromStdString(array.get(i,"").asString()));
+        list.append(array[i].toString());
     }
     return list;
 

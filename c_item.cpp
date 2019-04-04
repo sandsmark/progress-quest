@@ -1,4 +1,6 @@
 #include "c_item.h"
+#include <QJsonObject>
+#include <QJsonArray>
 
 c_Item::c_Item()
 {
@@ -266,15 +268,15 @@ void c_Item::makeClosestGrade(t_pq_equip iType, int grade)
     switch(eqSelect) {
     case pq_equip_weapon:
         itemList = &gConfig->Weapons;
-        break;;
+        break;
     case pq_equip_shield:
         itemList = &gConfig->Shields;
-        break;;
+        break;
     case pq_equip_armor:
         itemList = &gConfig->Armors;
-        break;;
+        break;
     case pq_equip_any:
-        break;;
+        break;
     }
 
     bool found(false);
@@ -327,87 +329,88 @@ void c_Item::makeClosestGrade(t_pq_equip iType, int grade)
 
 }
 
-Json::Value c_Item::save()
+QJsonObject c_Item::save()
 {
-    Json::Value root;
-    std::string mKey = "Item";
+    QJsonObject item;
 
     //t_pq_equip itemType;
     //fh << (int)itemType << std::endl;
-    root["Type"] = (int)itemType;
+    item["Type"] = int(itemType);
 
     //QString basename;
     //int     basegrade;
-    root["Name"] = basename.toStdString();
-    root["BaseGrade"] = basegrade;
+    item["Name"] = basename;
+    item["BaseGrade"] = basegrade;
 
     /*
     QStringList modifiers;
     QList<bool> modprefix;
     QList<int>  modgrades;
     */
-    root["Modifiers"] = c_Item::modListToArray(modifiers, modprefix, modgrades);
+    item["Modifiers"] = c_Item::modListToArray(modifiers, modprefix, modgrades);
     //int itemBonus;
-    root["Bonus"] = itemBonus;
+    item["Bonus"] = itemBonus;
 
     //int price;
-    root["Price"] = price;
+    item["Price"] = price;
 
     //int armorSlot;
-    root["ArmorSlot"] = armorSlot;
+    item["ArmorSlot"] = armorSlot;
 
     /*
     int Weight;
     */
-    root["Weight"] = Weight;
+    item["Weight"] = Weight;
+
+    QJsonObject root;
+    root["Item"] = item;
 
     return root;
 }
 
-void c_Item::load(Json::Value itemRoot)
+void c_Item::load(QJsonObject itemRoot)
 {
     //t_pq_equip itemType;
-    itemType = (t_pq_equip) itemRoot.get("Type", 0).asInt();
+    itemType = t_pq_equip(itemRoot["Type"].toInt());
 
     //QString basename;
     //int     basegrade;
-    basename = QString::fromStdString(itemRoot.get("Name", "").asString());
-    basegrade = itemRoot.get("BaseGrade", 0).asInt();
+    basename = itemRoot["Name"].toString();
+    basegrade = itemRoot["BaseGrade"].toInt();
 
     /*
     QStringList modifiers;
     QList<bool> modprefix;
     QList<int>  modgrades;
     */
-    c_Item::arrayToModList(itemRoot.get("Modifiers", Json::arrayValue),
+    c_Item::arrayToModList(itemRoot["Modifiers"].toArray(),
                            modifiers,
                            modprefix,
                            modgrades
                            );
 
     //int itemBonus;
-    itemBonus = itemRoot.get("Bonus", 0).asInt();
+    itemBonus = itemRoot["Bonus"].toInt();
 
     //int price;
-    price = itemRoot.get("Price", 0).asInt();
+    price = itemRoot["Price"].toInt();
 
     //int armorSlot;
-    armorSlot = itemRoot.get("ArmorSlot", 0).asInt();
+    armorSlot = itemRoot["ArmorSlot"].toInt();
 
     //int Weight;
-    Weight = itemRoot.get("Weight", 1).asInt();
+    Weight = itemRoot["Weight"].toInt(1);
 }
 
-Json::Value c_Item::modListToArray(QStringList &mList, QList<bool> &pList, QList<int> &gList)
+QJsonArray c_Item::modListToArray(QStringList &mList, QList<bool> &pList, QList<int> &gList)
 {
-    Json::Value array, set;
-    array.clear();
+    QJsonArray array;
 
     for (int i=0; i < mList.size(); i++)
     {
-        set.clear();
+        QJsonArray set;
 
-        set.append(mList.at(i).toStdString());
+        set.append(mList.at(i));
         set.append(pList.at(i));
         set.append(gList.at(i));
 
@@ -416,24 +419,20 @@ Json::Value c_Item::modListToArray(QStringList &mList, QList<bool> &pList, QList
     return array;
 }
 
-void c_Item::arrayToModList(Json::Value array, QStringList &mList, QList<bool> &pList, QList<int> &gList)
+void c_Item::arrayToModList(QJsonArray array, QStringList &mList, QList<bool> &pList, QList<int> &gList)
 {
-    Json::Value set;
-
     // if not already - wipe lists
     mList.clear();
     pList.clear();
     gList.clear();
 
     // cycle through items
-    for (Json::Value::ArrayIndex i=0; i < array.size(); i++)
+    for (int i=0; i < array.size(); i++)
     {
-        //set.clear(); //needed?
-        set = array.get(i,Json::arrayValue);
-
         // read in ordered set of values
-        mList.append(QString::fromStdString(set.get((Json::Value::ArrayIndex)0, "").asString()));
-        pList.append(set.get((Json::Value::ArrayIndex)1, false).asBool());
-        gList.append(set.get((Json::Value::ArrayIndex)2, 0).asInt());
+        QJsonArray set = array[i].toArray();
+        mList.append(set[0].toString());
+        pList.append(set[1].toBool());
+        gList.append(set[2].toInt());
     }
 }

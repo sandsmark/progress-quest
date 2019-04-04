@@ -6,8 +6,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "json/json.h"
-
 class c_Spell
 {
 public:
@@ -25,8 +23,8 @@ public:
     void setSpellLevel(int level);
 
     // serialization methods
-    Json::Value save();
-    void load(Json::Value root);
+    QJsonObject save();
+    void load(QJsonObject root);
 
 private:
     int nameIndex, levelValue;

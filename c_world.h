@@ -12,8 +12,7 @@
 #include <QObject>
 #include <QList>
 #include <QMessageBox>
-
-#include "json/json.h"
+#include <QJsonObject>
 
 typedef enum {
     pq_debug_none                       = 0,
@@ -97,8 +96,7 @@ public:
 private:
 
     // save / load helpers
-    Json::Value listToArray(QStringList &list);
-    QStringList arrayToList(Json::Value array);
+    QStringList arrayToList(QJsonArray array);
 
     /*
      *      Debug flags
@@ -115,7 +113,7 @@ public slots:
     void save(QString filename);
     void load();
     void load(QString filename);
-    void load(Json::Value root);
+    void load(QJsonObject root);
 };
 
 #endif // C_WORLD_H
