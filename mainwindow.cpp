@@ -343,7 +343,7 @@ QString MainWindow::randQuest()
         switch (rand() % 3) {
         case 1:  rtnQuest += "Inquire after the "; break;
         case 2:  rtnQuest += "Aspire for the "; break;
-        default: rtnQuest += "Seek you the ";
+        default: rtnQuest += "Seek the ";
         }
 
         //      object
