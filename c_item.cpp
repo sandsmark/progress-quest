@@ -371,6 +371,8 @@ QJsonObject c_Item::save()
 
 void c_Item::load(QJsonObject itemRoot)
 {
+    itemRoot = itemRoot["Item"].toObject();
+
     //t_pq_equip itemType;
     itemType = Equipment(itemRoot["Type"].toInt());
 
