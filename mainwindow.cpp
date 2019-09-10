@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // timer drive
     pb_action_timer = new QTimer(this);
     // connect timer drive
-    connect(pb_action_timer, SIGNAL(timeout()), this, SLOT(incr_pb_action_value()));
+    connect(pb_action_timer, &QTimer::timeout, this, &MainWindow::incr_pb_action_value);
 
     // new main classes
     game = new c_World;
@@ -50,8 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     startup.exec();
 
     // if game was loaded then update ui throughly
-    if (game->isLoaded)
+    if (game->isLoaded) {
         MainWindow::postLoadUpdates();
+    }
 
     // start actions
     MainWindow::setAction();
@@ -103,7 +104,7 @@ void MainWindow::incr_pb_action_value()
             break;
         }
 
-        MainWindow::tranState();
+        MainWindow::transitionState();
     }
 
     if (game->isDebugFlagSet(pq_debug_action_triggers_save))
@@ -242,10 +243,12 @@ void MainWindow::initFrames()
     for (int i = 0; i < gConfig->Traits.size(); i++) {
         ui->tbl_traits->setItem(i, 0, new QTableWidgetItem( gConfig->Traits.at(i) ));
     }
+
     ui->tbl_traits->setItem(0, 1, new QTableWidgetItem( game->Player->Name ));
     ui->tbl_traits->setItem(1, 1, new QTableWidgetItem( game->Player->Race ));
     ui->tbl_traits->setItem(2, 1, new QTableWidgetItem( game->Player->Voc ));
     ui->tbl_traits->setItem(3, 1, new QTableWidgetItem( game->Player->Level ));
+    ui->tbl_traits->resizeColumnsToContents();
 
 
     // stats
@@ -281,7 +284,7 @@ void MainWindow::initFrames()
     }
 
     // quests update
-    MainWindow::updQuestList();
+    MainWindow::updateQuestList();
 
 }
 
@@ -451,7 +454,7 @@ void MainWindow::setAction()
         pb_action_timer->setInterval(game->actionTime);
 }
 
-void MainWindow::tranState()
+void MainWindow::transitionState()
 {
     switch (game->currentState) {
     case State::Reserved1:
@@ -816,6 +819,8 @@ void MainWindow::updInvTbl()
         ui->tbl_inventory->setItem(i+1, 1, new QTableWidgetItem(QString::number(game->Player->Quantity.at(i))) );
     }
 
+    ui->tbl_inventory->resizeColumnsToContents();
+
     ui->lbl_inventory->setText( tr("Inventory ") +\
                                 QString::number(game->Player->Encumbrance()) +\
                                 tr(" units") );
@@ -838,6 +843,8 @@ void MainWindow::updEquipTbl()
     for (int i(0); i < game->Player->Armor.size(); i++) {
          ui->tbl_equipment->setItem(i + 2, 1, new QTableWidgetItem(game->Player->Armor.at(i)->Name()) );
     }
+
+    ui->tbl_equipment->resizeColumnsToContents();
 }
 
 void MainWindow::updStatsTbl()
@@ -863,6 +870,7 @@ void MainWindow::updStatsTbl()
     ui->tbl_stats->setItem(6, 1, new QTableWidgetItem(game->Player->HPMax));
     ui->tbl_stats->setItem(7, 1, new QTableWidgetItem(game->Player->MPMax));
 
+    ui->tbl_stats->resizeColumnsToContents();
 }
 
 void MainWindow::updSpellTbl()
@@ -876,6 +884,8 @@ void MainWindow::updSpellTbl()
         ui->tbl_spells->setItem( i, 0, new QTableWidgetItem(game->Player->Spells.at(i)->Name()) );
         ui->tbl_spells->setItem( i, 1, new QTableWidgetItem(game->Player->Spells.at(i)->Level()) );
     }
+
+    ui->tbl_spells->resizeColumnsToContents();
 }
 
 void MainWindow::gameSave()
@@ -926,20 +936,17 @@ void MainWindow::postLoadUpdates()
     ui->pb_quest->setValue(game->pb_quest);
 
     // handle quests
-    MainWindow::updQuestList();
+    MainWindow::updateQuestList();
 
     // update action conditions
     ui->lbl_action->setText(game->Action);
     pb_action_timer->setInterval(game->actionTime);
 
     // update char sht label for debug mode
-    if (! game->isDebugFlagSet(pq_debug_none))
-    {
+    if (!game->isDebugFlagSet(pq_debug_none)) {
         ui->lbl_char->setText("Character Sheet [debug mode]");
         ui->lbl_char->update();
-    }
-    else
-    {
+    } else {
         ui->lbl_char->setText("Character Sheet");
         ui->lbl_char->update();
     }
@@ -950,12 +957,11 @@ void MainWindow::postLoadUpdates()
     MainWindow::initFrames();
 }
 
-void MainWindow::updQuestList()
+void MainWindow::updateQuestList()
 {
     // update the quest list box from game data
     ui->lst_quests->clear();
-    if (game->quests.size() > 0)
-    {
+    if (game->quests.size() > 0) {
         // handle full quests list in game data
         MainWindow::addQuest(game->quests.at(0)); // prime the list
         for (int i=1; i < game->quests.size(); i++)
@@ -967,9 +973,7 @@ void MainWindow::updQuestList()
             // add current to end of listbox
             MainWindow::addQuest(game->quests.at(i));
         }
-    }
-    else
-    {
+    } else {
         // no quests in game data - add one
         game->quests.append(MainWindow::randQuest());
         MainWindow::addQuest(game->quests.at(0));
@@ -984,11 +988,9 @@ void MainWindow::keyPressEvent(QKeyEvent * k)
      *      sent back to the QWidget handler so certain default
      *      behaviors will occur
      */
-    if (game->isDebugFlagSet(pq_debug_active))
-    {
+    if (game->isDebugFlagSet(pq_debug_active)) {
         // debug is active here
-        if (k->key() == Qt::Key_Escape)
-        {
+        if (k->key() == Qt::Key_Escape) {
             // deactivate debug
             game->debugClear();
             ui->lbl_char->setText("Character Sheet");
@@ -997,34 +999,26 @@ void MainWindow::keyPressEvent(QKeyEvent * k)
         }
 
         // we are already in debug mode
-        if(k->key() == Qt::Key_R)   // reset debug - without losing mode
-        {
+        if(k->key() == Qt::Key_R) {  // reset debug - without losing mode
             game->debugActive();
             return;
         }
 
-        if(k->key() == Qt::Key_0)   // toggle zero action time
-        {
+        if(k->key() == Qt::Key_0) {  // toggle zero action time
             game->toggleDebugFlag(pq_debug_zero_action_timer);
             return;
         }
 
-        if(k->key() == Qt::Key_S)   // toggle save on action
-        {
+        if(k->key() == Qt::Key_S) { // toggle save on action
             game->toggleDebugFlag(pq_debug_action_triggers_save);
             return;
         }
 
-        if(k->key() == Qt::Key_A)   // toggle always trigger action
-        {
+        if(k->key() == Qt::Key_A) { // toggle always trigger action
             game->toggleDebugFlag(pq_debug_always_trigger_action);
             return;
         }
-
-
-    }
-    else
-    {
+    } else {
         // not in debug mode - yet
         if (k->key() == Qt::Key_Escape)
         {

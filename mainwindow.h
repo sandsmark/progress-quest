@@ -62,10 +62,10 @@ private:
     void updInvTbl();
     void updEquipTbl();
     void updStatsTbl();
-    void updQuestList();
+    void updateQuestList();
     void postLoadUpdates();
 
-    void tranState();
+    void transitionState();
 
     // key responder reimplementation
     void keyPressEvent(QKeyEvent * k);
