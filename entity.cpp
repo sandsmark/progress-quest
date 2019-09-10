@@ -157,11 +157,11 @@ QJsonObject Entity::save()
 
     /*
     c_Item*         Weapon;
-    c_Item*         Sheild;
+    c_Item*         Shield;
     QList<c_Item*>  Armor;
     */
     entity["Weapon"] = Weapon->save();
-    entity["Sheild"] = Sheild->save();
+    entity["Shield"] = Shield->save();
     entity["Armor"] = Entity::itemListToArray(Armor);
 
     /*
@@ -185,16 +185,10 @@ void Entity::load(QJsonObject entityRoot)
     // unpack entity values
     entityRoot = entityRoot["Entity"].toObject();
 
-    /*
-    QString Name, Race, Voc, Level;
-    */
     Name = entityRoot["Name"].toString();
     Race = entityRoot["Race"].toString();
     Voc = entityRoot["Class"].toString();
     Level = entityRoot["Level"].toString();
-    /*
-    QString STR, INT, WIS, DEX, CON, CHA, HPMax, MPMax;
-    */
     STR = entityRoot["STR"].toString();
     INT = entityRoot["INT"].toString();
     WIS = entityRoot["WIS"].toString();
@@ -216,11 +210,11 @@ void Entity::load(QJsonObject entityRoot)
 
     /*
     c_Item*         Weapon;
-    c_Item*         Sheild;
+    c_Item*         Shield;
     QList<c_Item*>  Armor;
     */
     Weapon->load(entityRoot["Weapon"].toObject());
-    Sheild->load(entityRoot["Sheild"].toObject());
+    Shield->load(entityRoot["Shield"].toObject());
     Armor = Entity::arrayToItemList(entityRoot["Armor"].toArray());
 
     /*

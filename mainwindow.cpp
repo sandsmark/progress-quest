@@ -233,7 +233,7 @@ void MainWindow::initFrames()
     //QBrush lstItemGreyed(Qt::gray, Qt::Dense6Pattern);
     //QBrush lstItemWhite(Qt::white, Qt::SolidPattern);
     QListWidgetItem lstItemChecked, lstItemUnchecked;
-    lstItemChecked.setTextColor(Qt::gray);
+    lstItemChecked.setForeground(Qt::gray);
     lstItemChecked.setCheckState(Qt::Checked);
     lstItemUnchecked.setCheckState(Qt::Unchecked);
 

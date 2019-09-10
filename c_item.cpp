@@ -334,74 +334,34 @@ QJsonObject c_Item::save()
 {
     QJsonObject item;
 
-    //t_pq_equip itemType;
-    //fh << (int)itemType << std::endl;
     item["Type"] = int(itemType);
-
-    //QString basename;
-    //int     basegrade;
     item["Name"] = basename;
     item["BaseGrade"] = basegrade;
-
-    /*
-    QStringList modifiers;
-    QList<bool> modprefix;
-    QList<int>  modgrades;
-    */
     item["Modifiers"] = c_Item::modListToArray(modifiers, modprefix, modgrades);
-    //int itemBonus;
     item["Bonus"] = itemBonus;
-
-    //int price;
     item["Price"] = price;
-
-    //int armorSlot;
     item["ArmorSlot"] = armorSlot;
-
-    /*
-    int Weight;
-    */
     item["Weight"] = Weight;
 
     QJsonObject root;
     root["Item"] = item;
-
     return root;
 }
 
 void c_Item::load(QJsonObject itemRoot)
 {
     itemRoot = itemRoot["Item"].toObject();
-
-    //t_pq_equip itemType;
     itemType = Equipment(itemRoot["Type"].toInt());
-
-    //QString basename;
-    //int     basegrade;
     basename = itemRoot["Name"].toString();
     basegrade = itemRoot["BaseGrade"].toInt();
-
-    /*
-    QStringList modifiers;
-    QList<bool> modprefix;
-    QList<int>  modgrades;
-    */
     c_Item::arrayToModList(itemRoot["Modifiers"].toArray(),
                            modifiers,
                            modprefix,
                            modgrades
                            );
-
-    //int itemBonus;
     itemBonus = itemRoot["Bonus"].toInt();
-
-    //int price;
     price = itemRoot["Price"].toInt();
-
-    //int armorSlot;
     armorSlot = itemRoot["ArmorSlot"].toInt();
-
-    //int Weight;
     Weight = itemRoot["Weight"].toInt(1);
 }
 
