@@ -237,6 +237,27 @@ c_Config::c_Config()
 
     ImpressiveTitles << "King" << "Queen" << "Lord" << "Lady" << "Viceroy" << "Mayor" << "Prince"
                      << "Princess" << "Chief" << "Boss" << "Archbishop";
+
+    InterplotCinematics = {
+        {
+            "task|1|Exhausted, you arrive at a friendly oasis in a hostile land",
+            "task|2|You greet old friends and meet new allies",
+            "task|2|You are privy to a council of powerful do-gooders",
+            "task|1|There is much to be done. You are chosen!",
+        }, {
+            "task|10|Experiencing an enigmatic and foreboding night vision",
+            "task|6|Much is revealed about that wise old bastard you'd underestimated",
+            "task|6|A shocking series of events leaves you alone and bewildered, but resolute",
+            "task|4|Drawing upon an unexpected reserve of determination, you set out on a long and dangerous journey",
+            "task|2|Loading"
+        }, {
+            "task|1|Your quarry is in sight, but a mighty enemy bars your path!",
+            "task|4|A desperate struggle commences with *",
+            "task|2|Locked in grim combat with *",
+            "task|2|* seems to have the upper hand",
+            "task|2|You seem to gain the advantage over *",
+        }
+    };
 }
 
 QString c_Config::toRoman(int value)

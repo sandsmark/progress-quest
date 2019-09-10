@@ -479,6 +479,11 @@ void MainWindow::tranState()
         if (! MainWindow::canBuyNewEq(Equipment::Any))
             game->currentState = State::HeadingToKillingFields;
         break;
+    case State::InterplotCinematic:
+        if (game->interplotCinematic.isEmpty()) {
+            game->currentState = State::HeadingToKillingFields;
+        }
+        break;
     default:
         game->currentState = State::Reserved1;
     }

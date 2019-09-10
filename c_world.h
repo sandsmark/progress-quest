@@ -30,7 +30,8 @@ enum class State {
     Fighting,
     HeadingToTown,
     SellingOff,
-    BuyingNewEquipment
+    BuyingNewEquipment,
+    InterplotCinematic
 };
 
 class c_World : public QObject
@@ -79,6 +80,8 @@ public:
      *      Flag for Post Load UI Processing
      */
     bool isLoaded;
+
+    QStringList interplotCinematic;
 
     /*
      *    Public Methods

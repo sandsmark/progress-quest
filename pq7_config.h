@@ -45,6 +45,8 @@ public:
     QStringList Titles;
     QStringList ImpressiveTitles;
 
+    QList<QStringList> InterplotCinematics;
+
     QString toRoman(int value);
     QString capWords(QString string);
     QString Indefinite(QString string);
