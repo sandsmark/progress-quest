@@ -35,7 +35,7 @@ public:
 
     // equipment
     c_Item*         Weapon;
-    c_Item*         Sheild;
+    c_Item*         Shield;
     QList<c_Item*>  Armor;
 
     // used for buying new equipment

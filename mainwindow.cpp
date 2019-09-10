@@ -712,13 +712,13 @@ c_Item* MainWindow::getPurchaseItem(Equipment eqtype)
         break;
 
     case Equipment::Shield:
-        if (game->Player->Sheild->Name() == tr("")) {
+        if (game->Player->Shield->Name() == tr("")) {
             itemForPurchase = game->makeEqByGrade(Equipment::Shield, game->Player->Level.toInt());
             game->Player->setPurchNew(true);
         }
         else
         {
-            itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Sheild->Grade());
+            itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Shield->Grade());
             game->Player->setPurchNew(false);
         }
         break;
@@ -758,8 +758,8 @@ void MainWindow::buyNewEq()
         game->Player->Weapon = game->Player->Purchase;
         break;
     case Equipment::Shield:
-        delete game->Player->Sheild;
-        game->Player->Sheild = game->Player->Purchase;
+        delete game->Player->Shield;
+        game->Player->Shield = game->Player->Purchase;
         break;
     case Equipment::Armoy:
         delete game->Player->Armor[game->Player->Purchase->getASlot()];
@@ -834,7 +834,7 @@ void MainWindow::updEquipTbl()
         ui->tbl_equipment->setItem( i, 0, new QTableWidgetItem(gConfig->Equips.at(i)) );
     }
     ui->tbl_equipment->setItem(0, 1, new QTableWidgetItem(game->Player->Weapon->Name()) );
-    ui->tbl_equipment->setItem(1, 1, new QTableWidgetItem(game->Player->Sheild->Name()) );
+    ui->tbl_equipment->setItem(1, 1, new QTableWidgetItem(game->Player->Shield->Name()) );
     for (int i(0); i < game->Player->Armor.size(); i++) {
          ui->tbl_equipment->setItem(i + 2, 1, new QTableWidgetItem(game->Player->Armor.at(i)->Name()) );
     }

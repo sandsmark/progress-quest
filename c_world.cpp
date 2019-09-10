@@ -53,7 +53,7 @@ void c_World::initPlayer()
     Player->Weapon = c_World::makeEqByGrade(Equipment::Weapon, -4);
 
     // Look ma, no sheild!
-    Player->Sheild = new c_Item;
+    Player->Shield = new c_Item;
 
     // add two starting armors (weak, random)
     for(int i(0); i < 9; i++) {
