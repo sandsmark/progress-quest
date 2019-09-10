@@ -56,7 +56,7 @@ QString c_Item::Name()
     return rtn;
 }
 
-void c_Item::setName(QString itemName)
+void c_Item::setName(const QString &itemName)
 {
     basename = itemName;
 }
@@ -369,8 +369,7 @@ QJsonArray c_Item::modListToArray(QStringList &mList, QList<bool> &pList, QList<
 {
     QJsonArray array;
 
-    for (int i=0; i < mList.size(); i++)
-    {
+    for (int i=0; i < mList.size(); i++) {
         QJsonArray set;
 
         set.append(mList.at(i));
@@ -390,8 +389,7 @@ void c_Item::arrayToModList(QJsonArray array, QStringList &mList, QList<bool> &p
     gList.clear();
 
     // cycle through items
-    for (int i=0; i < array.size(); i++)
-    {
+    for (int i=0; i < array.size(); i++) {
         // read in ordered set of values
         QJsonArray set = array[i].toArray();
         mList.append(set[0].toString());

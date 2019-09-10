@@ -26,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->setFocusPolicy(Qt::StrongFocus);
     ui->centralWidget->setFocus();
 
+    ui->tbl_inventory->horizontalHeader()->setStretchLastSection(true);
+
     // connect the save / load buttons (debugging)
     //connect(ui->btn_save, SIGNAL(released()), this, SLOT(gameSave()));
     //connect(ui->btn_load, SIGNAL(released()), this, SLOT(gameLoad()));

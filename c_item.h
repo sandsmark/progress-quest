@@ -17,7 +17,7 @@ public:
 
     // accessors
     QString Name();
-    void setName(QString itemName);
+    void setName(const QString &itemName);
 
     int Bonus();
     void setBonus(int bonus);
