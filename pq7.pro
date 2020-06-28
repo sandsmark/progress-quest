@@ -57,3 +57,6 @@ OTHER_FILES += \
     README \
     INSTALL
 
+RESOURCES += \
+    resources.qrc
+

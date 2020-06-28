@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>swords.gif</file>
+        <file>crossed_swords_sm.gif</file>
+    </qresource>
+</RCC>

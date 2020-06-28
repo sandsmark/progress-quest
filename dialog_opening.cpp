@@ -9,9 +9,9 @@ Dialog_Opening::Dialog_Opening(QWidget *parent) :
     ui->setupUi(this);
 
     // attach buttons to functions
-    connect(ui->btn_random, SIGNAL(released()), this, SLOT(randNewChar()));
-    connect(ui->btn_load, SIGNAL(released()), this, SLOT(loadChar()));
-    connect(ui->btn_createNew, SIGNAL(released()), this, SLOT(createNewChar()));
+    connect(ui->btn_random, &QAbstractButton::released, this, &Dialog_Opening::randNewChar);
+    connect(ui->btn_load, &QAbstractButton::released, this, &Dialog_Opening::loadChar);
+    connect(ui->btn_createNew, &QAbstractButton::released, this, &Dialog_Opening::createNewChar);
 }
 
 Dialog_Opening::~Dialog_Opening()
