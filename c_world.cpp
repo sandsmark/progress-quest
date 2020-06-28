@@ -3,22 +3,13 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFile>
 
 c_World::c_World(QObject *parent) :
     QObject(parent)
 {
-    debug = pq_debug_none;
     Player = new Entity;
     Monster = new c_Monster;
-    Act = 0;
-    Action  = "";
-    currentState = State::Reserved1;
-    pb_action = 0;
-    pb_encumbrance = 0;
-    pb_experience = 0;
-    pb_plot = 0;
-    pb_quest = 0;
-    isLoaded = false;
 }
 
 void c_World::initPlayer()
@@ -38,7 +29,6 @@ void c_World::initPlayer()
     //c_Item *weapon = new c_Item;
     //c_Item *sheild = new c_Item;
     //QList<c_Item*> armor;
-    int index(0), i(0);
 
     // rand traits
     Player->Name = Player->nameRand();
@@ -56,13 +46,14 @@ void c_World::initPlayer()
     Player->Shield = new c_Item;
 
     // add two starting armors (weak, random)
-    for(int i(0); i < 9; i++) {
+    for(int i = 0; i < 9; i++) {
         Player->Armor.append(new c_Item);
     }
     // 2 *unique* armors - not the same one twice
+    int i = 0;
     do {
-        index = rand() % Player->Armor.size();
-        if (Player->Armor.at(index)->Name() == tr("")) {
+        const int index = rand() % Player->Armor.size();
+        if (Player->Armor.at(index)->Name().isEmpty()) {
             delete Player->Armor[index];
             Player->Armor[index] = c_World::makeEqByGrade(Equipment::Armoy, -2);
             i++;
@@ -168,37 +159,19 @@ void c_World::save(QString filename)
 
     QJsonObject world;
 
-    /*
-        int Act;
-        QString Action;
-        t_pq_state State;
-        */
     world["Act"] = Act;
     world["Action"] = Action;
     world["ActionTime"] = actionTime;
     world["State"] = int(currentState);
 
-    /*
-        int pb_action;
-        int pb_experience;
-        int pb_encumbrance;
-        int pb_plot;
-        int pb_quest;
-        */
     world["pb_action"] = pb_action;
     world["pb_experience"] = pb_experience;
     world["pb_encumbrance"] = pb_encumbrance;
     world["pb_plot"] = pb_plot;
     world["pb_quest"] = pb_quest;
 
-    /*
-        quint32 debug
-         */
     world["Debug"] = QString::number(debug);
 
-    /*
-        QStringList quests;
-        */
     world["Quests"] = QJsonArray::fromStringList(quests);
 
     //Entity* Player;
@@ -254,40 +227,20 @@ void c_World::load(QJsonObject root)
     // unpack world values from anonymous main json object
     root = root["World"].toObject();
 
-    //Entity* Player;
     Player->load(root["Player"].toObject());
 
-    //c_Monster* Monster;
     Monster->load(root["Monster"].toObject());
 
-    /*
-        int Act;
-        QString Action;
-        t_pq_state State;
-    */
     Act     = root["Act"].toInt(99);
     Action  = root["Action"].toString("Knock knock...");
     actionTime = root["ActionTime"].toInt(50);
     currentState   = State(root["State"].toInt());
 
-    /*
-    quint32 debug
-     */
     debug = root["Debug"].toString().toUInt();
 
-    /*
-        QStringList quests;
-    */
     // if not found, passes empty json array to helper which will return empty qstringlist
     quests = c_World::arrayToList(root["Quests"].toArray());
 
-    /*
-        int pb_action;
-        int pb_experience;
-        int pb_encumbrance;
-        int pb_plot;
-        int pb_quest;
-    */
     pb_action       = root["pb_action"].toInt(99);
     pb_experience   = root["pb_experience"].toInt(99);
     pb_encumbrance  = root["pb_encumbrance"].toInt(99);

@@ -43,28 +43,28 @@ public:
     /*
      *      Player instance - gamewide
      */
-    Entity* Player;
+    Entity* Player = nullptr;
 
     /*
      *      Monster instance - gamewide
      */
-    c_Monster* Monster;
+    c_Monster* Monster = nullptr;
 
     /*
      *      State values
      */
-    int Act;
+    int Act = 0;
     QString Action;
-    State currentState;
+    State currentState = State::Reserved1;
 
     /*
      *      Progress Bar values
      */
-    int pb_action;
-    int pb_experience;
-    int pb_encumbrance;
-    int pb_plot;
-    int pb_quest;
+    int pb_action = 0;
+    int pb_experience = 0;
+    int pb_encumbrance = 0;
+    int pb_plot = 0;
+    int pb_quest = 0;
 
     /*
      *      Quest history
@@ -74,12 +74,12 @@ public:
     /*
      *      Timer Interval
      */
-    int actionTime;
+    int actionTime = 0;
 
     /*
      *      Flag for Post Load UI Processing
      */
-    bool isLoaded;
+    bool isLoaded = false;
 
     QStringList interplotCinematic;
 
@@ -105,7 +105,7 @@ private:
     /*
      *      Debug flags
      */
-    quint32 debug;
+    quint32 debug = pq_debug_none;
 
 signals:
     //void debugChanged(quint32 dbgValue);
