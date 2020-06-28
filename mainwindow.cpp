@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tbl_inventory->horizontalHeader()->setStretchLastSection(true);
 
+
     // connect the save / load buttons (debugging)
     //connect(ui->btn_save, SIGNAL(released()), this, SLOT(gameSave()));
     //connect(ui->btn_load, SIGNAL(released()), this, SLOT(gameLoad()));
@@ -59,6 +60,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // start actions
     MainWindow::setAction();
     pb_action_timer->start();
+
+    ui->tbl_equipment->setGridStyle(Qt::SolidLine);
+    ui->tbl_inventory->setGridStyle(Qt::SolidLine);
+    ui->tbl_traits->setGridStyle(Qt::SolidLine);
+    ui->tbl_stats->setGridStyle(Qt::SolidLine);
+    ui->tbl_spells->setGridStyle(Qt::SolidLine);
 }
 
 MainWindow::~MainWindow()
