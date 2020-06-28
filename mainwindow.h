@@ -43,26 +43,27 @@ private:
     //void initPlayer();
 
     void addAct();
+    void startAct();
     void addQuest(QString name);
-    QString randQuest();
+    QString generateQuest();
 
     void setMonster();
-    void addMonDrop();
-    QString sellInvItem();
-    void rmInvItem();
+    void addMonsterDrop();
+    QString sellInventoryItem();
+    void removeInventoryItem();
 
-    void buyNewEq();
-    bool canBuyNewEq(Equipment eqtype);
+    void buyEquipment();
+    bool canBuyEquipment(Equipment eqtype);
     c_Item *getPurchaseItem(Equipment eqtype);
-    c_Item *upgradeEq(Equipment eqtype, int grade);
+    c_Item *upgradeEquipment(Equipment eqtype, int grade);
 
     void winStats();
     void winSpells();
 
-    void updSpellTbl();
-    void updInvTbl();
-    void updEquipTbl();
-    void updStatsTbl();
+    void updateSpellTable();
+    void updateInventoryTable();
+    void updateEquipmentTable();
+    void updateStatsTable();
     void updateQuestList();
     void postLoadUpdates();
 
@@ -76,10 +77,10 @@ private:
 
 public slots:
     void incr_pb_action_value();
-    void incr_pb_experience_value();
-    void incr_pb_encumbrance_value();
-    void incr_pb_plot_value();
-    void incr_pb_quest_value();
+    void increaseExperience();
+    void updateEncumberance();
+    void progressPlot();
+    void progressQuest();
 
     void gameSave();
     //void gameLoad();

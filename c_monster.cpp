@@ -30,7 +30,7 @@ void c_Monster::clear()
     awardXP = 0;
 }
 
-QString c_Monster::Discription()
+QString c_Monster::description()
 {
     /*
       monster description builds rely on the following rules in the c_Config data
@@ -338,7 +338,7 @@ bool c_Monster::makeMounted(int level)
         // construct mounted monster
         if (found) {
             c_Monster::clear();
-            discription = rider.Discription() + tr(" mounted on a ") + mount.Discription();
+            discription = rider.description() + tr(" mounted on a ") + mount.description();
             monster_race = tr("Mounted Monster");
             monster_level = rider.Level().toInt() + mount.Level().toInt();
             drops.append(rider.Drops());
@@ -407,12 +407,12 @@ bool c_Monster::makeGroup(int level)
     if (found) {
         c_Monster::clear();
         if (numOfMinions < 2)
-            discription = minion.Discription()+ tr(", traveling with ") +
-                          gConfig->Indefinite(leader.Discription());
+            discription = minion.description()+ tr(", traveling with ") +
+                          gConfig->Indefinite(leader.description());
         else
             discription = tr("group of ") + QString().number(numOfMinions) + tr(" ") +
-                          gConfig->sufPlural(minion.Discription()) + tr(", lead by ") +
-                          gConfig->Indefinite(leader.Discription());
+                          gConfig->sufPlural(minion.description()) + tr(", lead by ") +
+                          gConfig->Indefinite(leader.description());
 
         monster_race = tr("Monster Group");
         monster_level = leader.Level().toInt() + minion.Level().toInt() * numOfMinions;

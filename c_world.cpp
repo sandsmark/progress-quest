@@ -26,14 +26,11 @@ void c_World::initPlayer()
  */
 {
     c_Spell *spell = new c_Spell;
-    //c_Item *weapon = new c_Item;
-    //c_Item *sheild = new c_Item;
-    //QList<c_Item*> armor;
 
     // rand traits
-    Player->Name = Player->nameRand();
-    Player->Race = Player->raceRand();
-    Player->Voc  = Player->vocRand();
+    Player->Name = Player->generateName();
+    Player->Race = Player->randomRace();
+    Player->Voc  = Player->randomVocation();
 
     // add starting spell
     spell->setRandName();
@@ -88,7 +85,6 @@ c_Item *c_World::makeEqByGrade(Equipment eqtype, int grade)
     switch (eqSelect) {
 
     case Equipment::Weapon:
-
         equip->makeClosestGrade(eqSelect, grade);
 
         // 2 possible mods, 50% chnc each: player level affects pos/neg
@@ -104,11 +100,9 @@ c_Item *c_World::makeEqByGrade(Equipment eqtype, int grade)
 
         // set bonus to make up differance in grade
         equip->setBonus(grade - equip->Grade());
-
         break;
 
     case Equipment::Shield:
-
         equip->makeClosestGrade(eqSelect, grade);
 
         // 2 possible mods, 50% chnc each: player level affects pos/neg
@@ -124,11 +118,9 @@ c_Item *c_World::makeEqByGrade(Equipment eqtype, int grade)
 
         // set bonus to make up differance in grade
         equip->setBonus(grade - equip->Grade());
-
         break;
 
     case Equipment::Armoy:
-
         equip->makeClosestGrade(eqSelect, grade);
 
         // 2 possible mods, 50% chnc each: player level affects pos/neg
@@ -144,7 +136,6 @@ c_Item *c_World::makeEqByGrade(Equipment eqtype, int grade)
 
         // set bonus to make up differance in grade
         equip->setBonus(grade - equip->Grade());
-
         break;
 
     case Equipment::Any:

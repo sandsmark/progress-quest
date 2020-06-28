@@ -16,7 +16,7 @@ class Entity : public QObject
     Q_OBJECT
 
 public:
-    explicit Entity(QObject *parent = 0);
+    explicit Entity(QObject *parent = nullptr);
 
     // traits (Voc=Vocation)
     QString Name, Race, Voc, Level;
@@ -34,13 +34,13 @@ public:
     QList<c_Spell *> Spells;
 
     // equipment
-    c_Item         *Weapon;
-    c_Item         *Shield;
+    c_Item         *Weapon = nullptr;
+    c_Item         *Shield = nullptr;
     QList<c_Item *>  Armor;
 
     // used for buying new equipment
-    c_Item         *Purchase;
-    QString         purchType();
+    c_Item         *Purchase = nullptr;
+    QString         purchaseType();
     void            setPurchNew(bool is_new);
 
     // inventory
@@ -50,13 +50,13 @@ public:
     int maxEncumbrance();
 
     // Gold (ah, weightless gold)
-    int Gold;
+    int Gold = 0;
 
     // random methods - used in init
-    QString nameRand();
-    QString raceRand();
-    QString vocRand();
-    void incrLevel();
+    QString generateName();
+    QString randomRace();
+    QString randomVocation();
+    void increaseLevel();
 
     QJsonObject save();
     void load(QJsonObject entityRoot);

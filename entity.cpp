@@ -7,9 +7,6 @@ Entity::Entity(QObject *parent) :
     QObject(parent)
 {
     // traits
-    Name = "";
-    Race = "";
-    Voc = "";
     Level = "1";
 
     // stats
@@ -43,7 +40,7 @@ int Entity::Encumbrance()
     return totWeight;
 }
 
-QString Entity::purchType()
+QString Entity::purchaseType()
 {
     if (isNewPurchase) {
         return "new";
@@ -82,7 +79,7 @@ QString Entity::statRand(int basevalue, int offset)
     return QString::number(rand() % basevalue + offset);
 }
 
-QString Entity::nameRand()
+QString Entity::generateName()
 {
     QString build;
     QStringList nameparts;
@@ -103,21 +100,17 @@ QString Entity::nameRand()
     return build;
 }
 
-QString Entity::raceRand()
+QString Entity::randomRace()
 {
-    QStringList cdata;
-    cdata = gConfig->Races.at(rand() % gConfig->Races.size()).split("|");
-    return cdata.at(0); // race name
+    return gConfig->Races.at(rand() % gConfig->Races.size()).split("|").first();
 }
 
-QString Entity::vocRand()
+QString Entity::randomVocation()
 {
-    QStringList cdata;
-    cdata = gConfig->Klasses.at(rand() % gConfig->Klasses.size()).split("|");
-    return cdata.at(0); // class name
+    return gConfig->Klasses.at(rand() % gConfig->Klasses.size()).split("|").first();
 }
 
-void Entity::incrLevel()
+void Entity::increaseLevel()
 {
     XP = "0";
     Level = QString().number(Level.toInt() + 1);
@@ -125,19 +118,13 @@ void Entity::incrLevel()
 
 QJsonObject Entity::save()
 {
-//    Json::Value root;
     QJsonObject entity;
-    std::string mKey = "Entity";
-    /*
-    QString Name, Race, Voc, Level;
-    */
+
     entity["Name"] = Name;
     entity["Race"] = Race;
     entity["Class"] = Voc;
     entity["Level"] = Level;
-    /*
-    QString STR, INT, WIS, DEX, CON, CHA, HPMax, MPMax;
-    */
+
     entity["STR"] = STR;
     entity["INT"] = INT;
     entity["WIS"] = WIS;
@@ -146,34 +133,17 @@ QJsonObject Entity::save()
     entity["CHA"] = CHA;
     entity["HPMax"] = HPMax;
     entity["MPMax"] = MPMax;
-    /*
-    QString XP;
-    */
+
     entity["XP"] = XP;
 
-    /*
-    QList<c_Spell*> Spells;
-    */
     entity["Spells"] = Entity::spellListToArray(Spells);
 
-    /*
-    c_Item*         Weapon;
-    c_Item*         Shield;
-    QList<c_Item*>  Armor;
-    */
     entity["Weapon"] = Weapon->save();
     entity["Shield"] = Shield->save();
     entity["Armor"] = Entity::itemListToArray(Armor);
 
-    /*
-    QList<c_Item*> Inventory;
-    QList<int> Quantity;
-    */
     entity["Inventory"] = Entity::invListToArray(Inventory, Quantity);
 
-    /*
-    int Gold;
-    */
     entity["Gold"] = Gold;
 
     QJsonObject root;
@@ -199,34 +169,16 @@ void Entity::load(QJsonObject entityRoot)
     HPMax = entityRoot["HPMax"].toString();
     MPMax = entityRoot["MPMax"].toString();
 
-    /*
-    QString XP;
-    */
     XP = entityRoot["XP"].toString();
 
-    /*
-    QList<c_Spell*> Spells;
-    */
     Spells = Entity::arrayToSpellList(entityRoot["Spells"].toArray());
 
-    /*
-    c_Item*         Weapon;
-    c_Item*         Shield;
-    QList<c_Item*>  Armor;
-    */
     Weapon->load(entityRoot["Weapon"].toObject());
     Shield->load(entityRoot["Shield"].toObject());
     Armor = Entity::arrayToItemList(entityRoot["Armor"].toArray());
 
-    /*
-    QList<c_Item*> Inventory;
-    QList<int> Quantity;
-    */
     Entity::arrayToInvList(entityRoot["Inventory"].toArray(), Inventory, Quantity);
 
-    /*
-    int Gold;
-    */
     Gold = entityRoot["Gold"].toInt();
 }
 

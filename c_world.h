@@ -50,6 +50,8 @@ public:
      */
     c_Monster *Monster = nullptr;
 
+    c_Monster *Nemesis = nullptr;
+
     /*
      *      State values
      */

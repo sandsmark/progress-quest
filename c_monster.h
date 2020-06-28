@@ -13,9 +13,9 @@ class c_Monster : public QObject
 {
     Q_OBJECT
 public:
-    explicit c_Monster(QObject *parent = 0);
+    explicit c_Monster(QObject *parent = nullptr);
 
-    QString Discription();
+    QString description();
     QString Level();
 
     QStringList Drops();

@@ -42,10 +42,10 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow::initFrames();
 
     //set state must be after initPlayer (for canBuy.. to work)
-    if (MainWindow::canBuyNewEq(Equipment::Any)) {
+    if (MainWindow::canBuyEquipment(Equipment::Any)) {
         game->currentState = State::BuyingNewEquipment;
     } else {
-        game->currentState = State::HeadingToKillingFields;
+        startAct();
     }
 
     // startup dialog
@@ -92,25 +92,28 @@ void MainWindow::incr_pb_action_value()
 
         switch (game->currentState) {
         case State::Reserved1:
+            qWarning() << "increase Invalid state" << int(game->currentState);
             break;
         case State::HeadingToKillingFields:
             break;
         case State::Fighting:
-            MainWindow::incr_pb_experience_value();
+            MainWindow::increaseExperience();
 
-            MainWindow::incr_pb_quest_value();
+            MainWindow::progressQuest();
 
-            MainWindow::incr_pb_encumbrance_value();
-            MainWindow::addMonDrop();
+            MainWindow::updateEncumberance();
+            MainWindow::addMonsterDrop();
             break;
         case State::HeadingToTown:
             break;
         case State::SellingOff:
-            MainWindow::rmInvItem();
-            MainWindow::incr_pb_encumbrance_value();
+            MainWindow::removeInventoryItem();
+            MainWindow::updateEncumberance();
             break;
         case State::BuyingNewEquipment:
-            MainWindow::buyNewEq();
+            MainWindow::buyEquipment();
+            break;
+        case State::InterplotCinematic:
             break;
         }
 
@@ -124,7 +127,7 @@ void MainWindow::incr_pb_action_value()
     game->pb_action = ui->pb_action->value();
 }
 
-void MainWindow::incr_pb_encumbrance_value()
+void MainWindow::updateEncumberance()
 {
     // get percent value of encumbrance
     int value = int(((float)game->Player->Encumbrance() / (float)game->Player->maxEncumbrance() * 100.0));
@@ -135,11 +138,8 @@ void MainWindow::incr_pb_encumbrance_value()
     game->pb_encumbrance = ui->pb_encumbrance->value();
 }
 
-void MainWindow::incr_pb_plot_value()
+void MainWindow::progressPlot()
 {
-    QString actName;
-    actName = "Act ";
-
     int value = ui->pb_plot->value() + (rand() % 6 + 1);
     if (value < ui->pb_plot->maximum()) {
         // progress plot
@@ -158,17 +158,18 @@ void MainWindow::incr_pb_plot_value()
         //      clear quests and start new one
         ui->lst_quests->clear();
         game->quests.clear();
-        MainWindow::addQuest(MainWindow::randQuest());
+        MainWindow::addQuest(MainWindow::generateQuest());
 
         //      add new act
         game->Act++;
         MainWindow::addAct();
 
+        startAct();
     }
     game->pb_plot = ui->pb_plot->value();
 }
 
-void MainWindow::incr_pb_quest_value()
+void MainWindow::progressQuest()
 {
     int value = ui->pb_quest->value() + (rand() % 4 + 1);
     if (value < ui->pb_quest->maximum()) {
@@ -186,14 +187,14 @@ void MainWindow::incr_pb_quest_value()
         ui->lst_quests->currentItem()->setCheckState(Qt::Checked);
 
         //      add new and progress plot
-        game->quests.push_back(MainWindow::randQuest());
+        game->quests.push_back(MainWindow::generateQuest());
         MainWindow::addQuest(game->quests.at(game->quests.size() - 1));
-        MainWindow::incr_pb_plot_value();
+        MainWindow::progressPlot();
     }
     game->pb_quest = ui->pb_quest->value();
 }
 
-void MainWindow::incr_pb_experience_value()
+void MainWindow::increaseExperience()
 {
 
     if (game->currentState == State::Fighting) {
@@ -211,7 +212,7 @@ void MainWindow::incr_pb_experience_value()
         } else {
             // level up
             //      incr level
-            game->Player->incrLevel();
+            game->Player->increaseLevel();
             ui->tbl_traits->setCurrentCell(3,1);
             ui->tbl_traits->currentItem()->setText(game->Player->Level);
 
@@ -233,8 +234,6 @@ void MainWindow::incr_pb_experience_value()
 
 void MainWindow::initFrames()
 {
-    //QBrush lstItemGreyed(Qt::gray, Qt::Dense6Pattern);
-    //QBrush lstItemWhite(Qt::white, Qt::SolidPattern);
     QListWidgetItem lstItemChecked, lstItemUnchecked;
     lstItemChecked.setForeground(Qt::gray);
     lstItemChecked.setCheckState(Qt::Checked);
@@ -254,16 +253,16 @@ void MainWindow::initFrames()
 
 
     // stats
-    MainWindow::updStatsTbl();
+    MainWindow::updateStatsTable();
 
     // spells
-    MainWindow::updSpellTbl();
+    MainWindow::updateSpellTable();
 
     // equipment
-    MainWindow::updEquipTbl();
+    MainWindow::updateEquipmentTable();
 
     // list inventory
-    MainWindow::updInvTbl();
+    MainWindow::updateInventoryTable();
 
     // list plotline values
     if (game->Act == 0) {
@@ -286,9 +285,12 @@ void MainWindow::initFrames()
     // quests update
     MainWindow::updateQuestList();
 
+    game->interplotCinematic = gConfig->InterplotCinematics[rand() % gConfig->InterplotCinematics.count()];
+    game->currentState = State::InterplotCinematic;
+
 }
 
-QString MainWindow::randQuest()
+QString MainWindow::generateQuest()
 {
     /*
        3 types of quests:
@@ -297,73 +299,67 @@ QString MainWindow::randQuest()
        Hunt are for monsters. Fetch is for boring items. Seek is some special item.
     */
 
-    int randQuest = rand() % 3 + 1;
+    const int questType = rand() % 3 + 1;
 
-    QString rtnQuest;
-    rtnQuest.clear();
-
+    QString questText;
     QStringList cdata;
 
     c_Item special;
 
-    switch (randQuest) {
-
+    switch (questType) {
     case 1:
         // Hunt quest
 
-        //      preamble
         switch (rand() % 3) {
         case 1:
-            rtnQuest += "Quell the ";
+            questText = tr("Quell the %1");
             break;
         case 2:
-            rtnQuest += "Placate the ";
+            questText = tr("Placate the %1");
             break;
         default:
-            rtnQuest += "Hunt the ";
+            questText = tr("Hunt the %1");
         }
 
         //      object
         cdata = gConfig->Monsters.at(rand() % gConfig->Monsters.size()).split("|");
-        rtnQuest += cdata.at(0); // name
+        questText = questText.arg(cdata.at(0)); // name
         break;
 
     case 2:
         // Fetch quest
 
-        //      preable
         switch (rand() % 4) {
         case 1:
-            rtnQuest += "Deliver this ";
+            questText = tr("Deliver this %1");
             break;
         case 2:
-            rtnQuest += "Collect payment for this ";
+            questText = tr("Collect payment for this %1");
             break;
         case 3:
-            rtnQuest += "Hide this ";
+            questText = tr("Hide this %1");
             break;
         default:
-            rtnQuest += "Fetch my ";
+            questText = tr("Fetch my %1");
         }
 
         //      object
         cdata << gConfig->BoringItems.at(rand() % gConfig->BoringItems.size());
-        rtnQuest += cdata.at(0);
+        questText = questText.arg(cdata.at(0));
         break;
 
     case 3:
         // Seek quest
 
-        //      preamble
         switch (rand() % 3) {
         case 1:
-            rtnQuest += "Inquire after the ";
+            questText = tr("Inquire after the %1");
             break;
         case 2:
-            rtnQuest += "Aspire for the ";
+            questText = tr("Aspire for the %1");
             break;
         default:
-            rtnQuest += "Seek the ";
+            questText = tr("Seek the %1");
         }
 
         //      object
@@ -371,14 +367,14 @@ QString MainWindow::randQuest()
         if (rand() % 3 == 0) {
             special.addAdjMod();
         }
-        rtnQuest += special.Name();
+        questText = questText.arg(special.Name());
         break;
 
     default:
-        rtnQuest = "?";
+        questText = "?";
     }
 
-    return rtnQuest;
+    return questText;
 }
 
 void MainWindow::addQuest(QString name)
@@ -398,10 +394,9 @@ void MainWindow::addAct()
     QString actName;
 
     if (game->Act == 0) {
-        actName = "Prologue";
+        actName = tr("Prologue");
     } else {
-        actName =  "Act ";
-        actName += gConfig->toRoman(game->Act);
+        actName = tr("Act %1").arg(gConfig->toRoman(game->Act));
     }
 
     ui->lst_plot->addItem(new QListWidgetItem());
@@ -410,11 +405,27 @@ void MainWindow::addAct()
     ui->lst_plot->currentItem()->setCheckState(Qt::PartiallyChecked);
 }
 
+void MainWindow::startAct()
+{
+    if (game->Nemesis) {
+        game->Nemesis->deleteLater();
+        game->Nemesis = nullptr;
+    }
+
+    game->Nemesis = new c_Monster;
+    game->Nemesis->makeByLevel(game->Player->Level.toInt() + 3);
+
+    game->interplotCinematic = gConfig->InterplotCinematics[rand() % gConfig->InterplotCinematics.count()];
+    game->currentState = State::InterplotCinematic;
+    qDebug() << "starting plot" << game->interplotCinematic.first();
+}
+
 void MainWindow::setAction()
 {
     game->Action.clear();
     switch (game->currentState) {
     case State::Reserved1:
+        qWarning() << "set action invalid state" << int(game->currentState);
         // reserved
         break;
     case State::HeadingToKillingFields:
@@ -426,8 +437,7 @@ void MainWindow::setAction()
     case State::Fighting:
         // fight
         MainWindow::setMonster();
-        game->Action = tr("Executing ") +\
-                       gConfig->Indefinite(game->Monster->Discription());
+        game->Action = tr("Executing %1").arg(gConfig->Indefinite(game->Monster->description()));
         game->actionTime = 50;
         break;
     case State::HeadingToTown:
@@ -437,14 +447,15 @@ void MainWindow::setAction()
         break;
     case State::SellingOff:
         // selling off
-        game->Action = tr("Selling ") + MainWindow::sellInvItem();
+        game->Action = tr("Selling %1").arg(MainWindow::sellInventoryItem());
         game->actionTime = 20;
         break;
     case State::BuyingNewEquipment:
         // shopping!!
-        game->Action = tr("Negotiating purchase of ") +
-                       game->Player->purchType() +tr(" ") +
-                       game->Player->Purchase->Name() + tr(" ");
+        game->Action = tr("Negotiating purchase of %1 %2 ").arg(
+                       game->Player->purchaseType()).arg(
+                       game->Player->Purchase->Name());
+
         switch (game->Player->Purchase->Type()) {
         case Equipment::Weapon:
             game->Action += tr("(weapon)");
@@ -460,6 +471,14 @@ void MainWindow::setAction()
         }
         game->actionTime = 35;
         break;
+    case State::InterplotCinematic: {
+        const QStringList plot =  game->interplotCinematic.takeFirst().split('|');
+        Q_ASSERT(plot.count() == 3);
+        game->Action = plot[2];
+        game->Action.replace('*', game->Nemesis->description());
+        game->actionTime = plot[1].toInt() * 10;
+        break;
+    }
     default:
         game->Action = tr("You are lost in another plane of existance");
         game->actionTime = 1000;
@@ -480,37 +499,45 @@ void MainWindow::transitionState()
     case State::Reserved1:
         game->currentState = State::HeadingToKillingFields;
         break;
+
     case State::HeadingToKillingFields:
         game->currentState = State::Fighting;
         break;
+
     case State::Fighting:
         if (game->Player->Encumbrance() > game->Player->maxEncumbrance()) {
             game->currentState = State::HeadingToTown;
         }
         break;
+
     case State::HeadingToTown:
         game->currentState = State::SellingOff;
         break;
+
     case State::SellingOff:
         if (game->Player->Inventory.empty()) {
-            if (MainWindow::canBuyNewEq(Equipment::Any)) {
+            if (MainWindow::canBuyEquipment(Equipment::Any)) {
                 game->currentState = State::BuyingNewEquipment;
             } else {
                 game->currentState = State::HeadingToKillingFields;
             }
         }
         break;
+
     case State::BuyingNewEquipment:
-        if (! MainWindow::canBuyNewEq(Equipment::Any)) {
+        if (! MainWindow::canBuyEquipment(Equipment::Any)) {
             game->currentState = State::HeadingToKillingFields;
         }
         break;
+
     case State::InterplotCinematic:
         if (game->interplotCinematic.isEmpty()) {
             game->currentState = State::HeadingToKillingFields;
         }
         break;
+
     default:
+        qWarning() << "Invalid state" << int(game->currentState);
         game->currentState = State::Reserved1;
     }
 
@@ -519,35 +546,35 @@ void MainWindow::transitionState()
 
 void MainWindow::setMonster()
 {
-    bool success(false);
+    bool success = false;
 
     // determine monster level from player's
-    int Lv = game->Player->Level.toInt();
-    Lv = Lv - (rand() % 10); // reduce monster lv up to -9 levels
-    if (Lv < 0) {
-        Lv = 0;    // no less than 0
+    int level = game->Player->Level.toInt();
+    level = level - (rand() % 10); // reduce monster lv up to -9 levels
+    if (level < 0) {
+        level = 0;    // no less than 0
     }
 
     // fill out monster
     do {
         game->Monster->clear();
 
-        if (game->Monster->makeByLevel(Lv) ||
-                game->Monster->makeMounted(Lv) ||
-                game->Monster->makeGroup(Lv)
+        if (game->Monster->makeByLevel(level) ||
+                game->Monster->makeMounted(level) ||
+                game->Monster->makeGroup(level)
            ) {
             success = true;
         }
     } while (! success); // potential infinite
 }
 
-void MainWindow::addMonDrop()
+void MainWindow::addMonsterDrop()
 {
 
     c_Item *drop;
 
     // traverse all drop for this monster
-    for (int i(0); i < game->Monster->Drops().size(); i++) {
+    for (int i = 0; i < game->Monster->Drops().size(); i++) {
 
         drop = new c_Item;
         bool found(false);
@@ -594,10 +621,10 @@ void MainWindow::addMonDrop()
         //delete drop;
     }
 
-    MainWindow::updInvTbl();
+    MainWindow::updateInventoryTable();
 }
 
-void MainWindow::rmInvItem()
+void MainWindow::removeInventoryItem()
 {
     // total sale gold value
     int saleValue = game->Player->Quantity.last() * game->Player->Inventory.last()->Appraisal();
@@ -608,10 +635,10 @@ void MainWindow::rmInvItem()
     game->Player->Quantity.removeLast();
     ui->tbl_inventory->removeRow(ui->tbl_inventory->rowCount());
 
-    MainWindow::updInvTbl();
+    MainWindow::updateInventoryTable();
 }
 
-QString MainWindow::sellInvItem()
+QString MainWindow::sellInventoryItem()
 {
     // reverse through player inventory and remove table
     // contents as you go
@@ -666,7 +693,7 @@ void MainWindow::winStats()
     game->Player->HPMax = game->Player->HPMax.number(game->Player->HPMax.toInt() + (rand() % 12 + 1));
     game->Player->MPMax = game->Player->MPMax.number(game->Player->MPMax.toInt() + (rand() % 8 + 1));
 
-    MainWindow::updStatsTbl();
+    MainWindow::updateStatsTable();
 }
 
 void MainWindow::winSpells()
@@ -699,16 +726,15 @@ void MainWindow::winSpells()
     // discard if found
     if (found) {
         delete spell;
-    } else
+    } else {
         //add to list
-    {
         game->Player->Spells.append(spell);
     }
 
-    MainWindow::updSpellTbl();
+    MainWindow::updateSpellTable();
 }
 
-bool MainWindow::canBuyNewEq(Equipment eqtype)
+bool MainWindow::canBuyEquipment(Equipment eqtype)
 {
     // chk for spend limit must populate Player's purchase item
     int spendCap = gConfig->fnPercent(game->Player->Gold, 40); // 40% total gold
@@ -744,7 +770,7 @@ c_Item *MainWindow::getPurchaseItem(Equipment eqtype)
             game->Player->setPurchNew(true);
         } else {
             // upgrade
-            itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Weapon->Grade());
+            itemForPurchase = MainWindow::upgradeEquipment(eqSelect, game->Player->Weapon->Grade());
             game->Player->setPurchNew(false);
         }
         break;
@@ -754,7 +780,7 @@ c_Item *MainWindow::getPurchaseItem(Equipment eqtype)
             itemForPurchase = game->makeEqByGrade(Equipment::Shield, game->Player->Level.toInt());
             game->Player->setPurchNew(true);
         } else {
-            itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Shield->Grade());
+            itemForPurchase = MainWindow::upgradeEquipment(eqSelect, game->Player->Shield->Grade());
             game->Player->setPurchNew(false);
         }
         break;
@@ -768,7 +794,7 @@ c_Item *MainWindow::getPurchaseItem(Equipment eqtype)
             itemForPurchase->setASlot(pick);
             game->Player->setPurchNew(true);
         } else {
-            itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Armor.at(pick)->Grade());
+            itemForPurchase = MainWindow::upgradeEquipment(eqSelect, game->Player->Armor.at(pick)->Grade());
             itemForPurchase->setASlot(pick);
             game->Player->setPurchNew(false);
         }
@@ -780,7 +806,7 @@ c_Item *MainWindow::getPurchaseItem(Equipment eqtype)
     return itemForPurchase;
 }
 
-void MainWindow::buyNewEq()
+void MainWindow::buyEquipment()
 {
     // buy purchase item
     game->Player->Gold -= game->Player->Purchase->Appraisal();
@@ -806,12 +832,12 @@ void MainWindow::buyNewEq()
 
     //delete game->Player->Purchase;
 
-    MainWindow::updInvTbl();
-    MainWindow::updEquipTbl();
+    MainWindow::updateInventoryTable();
+    MainWindow::updateEquipmentTable();
 }
 
 
-c_Item *MainWindow::upgradeEq(Equipment eqtype, int grade)
+c_Item *MainWindow::upgradeEquipment(Equipment eqtype, int grade)
 {
     c_Item *equip = new c_Item;
     Equipment eqSelect = eqtype;
@@ -836,7 +862,7 @@ c_Item *MainWindow::upgradeEq(Equipment eqtype, int grade)
     return equip;
 }
 
-void MainWindow::updInvTbl()
+void MainWindow::updateInventoryTable()
 {
     ui->tbl_inventory->clearContents();
     ui->tbl_inventory->setRowCount(1 + game->Player->Inventory.size());
@@ -853,13 +879,11 @@ void MainWindow::updInvTbl()
 
     ui->tbl_inventory->resizeColumnsToContents();
 
-    ui->lbl_inventory->setText(tr("Inventory ") +\
-                               QString::number(game->Player->Encumbrance()) +\
-                               tr(" units"));
+    ui->lbl_inventory->setText(tr("Inventory %1 units").arg(game->Player->Encumbrance()));
 }
 
 
-void MainWindow::updEquipTbl()
+void MainWindow::updateEquipmentTable()
 {
     // wipe
     ui->tbl_equipment->clearContents();
@@ -879,7 +903,7 @@ void MainWindow::updEquipTbl()
     ui->tbl_equipment->resizeColumnsToContents();
 }
 
-void MainWindow::updStatsTbl()
+void MainWindow::updateStatsTable()
 {
     // wipe
     ui->tbl_stats->clearContents();
@@ -889,8 +913,8 @@ void MainWindow::updStatsTbl()
     for (int i = 0; i < gConfig->PrimeStats.size(); i++) {
         ui->tbl_stats->setItem(i, 0, new QTableWidgetItem(gConfig->PrimeStats.at(i)));
     }
-    ui->tbl_stats->setItem(ui->tbl_stats->rowCount() - 2, 0, new QTableWidgetItem("HP Max"));
-    ui->tbl_stats->setItem(ui->tbl_stats->rowCount() - 1, 0, new QTableWidgetItem("MP Max"));
+    ui->tbl_stats->setItem(ui->tbl_stats->rowCount() - 2, 0, new QTableWidgetItem(tr("HP Max")));
+    ui->tbl_stats->setItem(ui->tbl_stats->rowCount() - 1, 0, new QTableWidgetItem(tr("MP Max")));
 
     //      Load stats from player
     ui->tbl_stats->setItem(0, 1, new QTableWidgetItem(game->Player->STR));
@@ -905,7 +929,7 @@ void MainWindow::updStatsTbl()
     ui->tbl_stats->resizeColumnsToContents();
 }
 
-void MainWindow::updSpellTbl()
+void MainWindow::updateSpellTable()
 {
     // clear table
     ui->tbl_spells->clearContents();
@@ -1006,7 +1030,7 @@ void MainWindow::updateQuestList()
         }
     } else {
         // no quests in game data - add one
-        game->quests.append(MainWindow::randQuest());
+        game->quests.append(MainWindow::generateQuest());
         MainWindow::addQuest(game->quests.at(0));
     }
 }
