@@ -31,20 +31,20 @@ public:
 
 
     // spells
-    QList<c_Spell*> Spells;
+    QList<c_Spell *> Spells;
 
     // equipment
-    c_Item*         Weapon;
-    c_Item*         Shield;
-    QList<c_Item*>  Armor;
+    c_Item         *Weapon;
+    c_Item         *Shield;
+    QList<c_Item *>  Armor;
 
     // used for buying new equipment
-    c_Item*         Purchase;
+    c_Item         *Purchase;
     QString         purchType();
     void            setPurchNew(bool is_new);
 
     // inventory
-    QList<c_Item*> Inventory;
+    QList<c_Item *> Inventory;
     QList<int> Quantity;
     int Encumbrance();
     int maxEncumbrance();
@@ -66,7 +66,7 @@ signals:
 
 public slots:
 
-    
+
 private:
 
     bool isNewPurchase;

@@ -43,12 +43,12 @@ public:
     /*
      *      Player instance - gamewide
      */
-    Entity* Player = nullptr;
+    Entity *Player = nullptr;
 
     /*
      *      Monster instance - gamewide
      */
-    c_Monster* Monster = nullptr;
+    c_Monster *Monster = nullptr;
 
     /*
      *      State values
@@ -86,7 +86,7 @@ public:
     /*
      *    Public Methods
      */
-    c_Item* makeEqByGrade(Equipment eqtype , int grade);
+    c_Item *makeEqByGrade(Equipment eqtype, int grade);
     void initPlayer();
 
     bool isDebugFlagSet(t_pq_debug flag);
@@ -122,4 +122,4 @@ public slots:
 
 #endif // C_WORLD_H
 
-extern c_World* game;
+extern c_World *game;

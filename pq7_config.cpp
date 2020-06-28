@@ -281,8 +281,9 @@ QString c_Config::toRoman(int value)
     while (curValue > 0) {
 
         // find index of highest value
-        for (int i = 0; (curValue < values.at(i)); i++)
+        for (int i = 0; (curValue < values.at(i)); i++) {
             index = i + 1;
+        }
 
         // reduce by highest value, add roman numeral to set
         curValue -= values.at(index);
@@ -306,16 +307,12 @@ QString c_Config::capWords(QString string)
                 b = false;
             }
             build += string.at(i); // case-irrelavent, possible spc
-        }
-        else
-        {
+        } else {
             // look for word to set bound
             if (string.at(i) != QChar(' ')) {
                 b = true;
                 build += string.at(i).toUpper(); // upper first char
-            }
-            else
-            {
+            } else {
                 // spaces here - add
                 build += string.at(i);
             }
@@ -329,18 +326,20 @@ QString c_Config::sufPlural(QString string)
 {
     QString s = string.toLower(); // lc all chars
 
-    if (s.endsWith(QString("y")) )
-        return QString (string.mid(0,string.length()-1) + "ies");
-    else if (s.endsWith(QString("us")) )
-      return QString (string.mid(0,string.length()-2) + "i");
-    else if (s.endsWith(QString("ch")) || s.endsWith(QString("x")) ||\
-             s.endsWith(QString("s")) || s.endsWith(QString("sh")) )
-      return string + QString("es");
-    else if (s.endsWith(QString("f")) )
-      return QString (string.mid(0,string.length()-1) + "ves");
-    else if ( s.endsWith(QString("man")) )
-      return QString (string.mid(0,string.length()-2) + "en");
-    else return string + QString("s");
+    if (s.endsWith(QString("y"))) {
+        return QString(string.mid(0,string.length()-1) + "ies");
+    } else if (s.endsWith(QString("us"))) {
+        return QString(string.mid(0,string.length()-2) + "i");
+    } else if (s.endsWith(QString("ch")) || s.endsWith(QString("x")) ||\
+               s.endsWith(QString("s")) || s.endsWith(QString("sh"))) {
+        return string + QString("es");
+    } else if (s.endsWith(QString("f"))) {
+        return QString(string.mid(0,string.length()-1) + "ves");
+    } else if (s.endsWith(QString("man"))) {
+        return QString(string.mid(0,string.length()-2) + "en");
+    } else {
+        return string + QString("s");
+    }
 }
 
 QString c_Config::Indefinite(QString string)
@@ -348,39 +347,46 @@ QString c_Config::Indefinite(QString string)
     QString s = string.toLower(); // lc all chars
     QString rtn;
     if (
-            s.left(1) == QString("a") ||\
-            s.left(1) == QString("e") ||\
-            s.left(1) == QString("i") ||\
-            s.left(1) == QString("o") ||\
-            s.left(1) == QString("u")
-       )
+        s.left(1) == QString("a") ||\
+        s.left(1) == QString("e") ||\
+        s.left(1) == QString("i") ||\
+        s.left(1) == QString("o") ||\
+        s.left(1) == QString("u")
+    ) {
         rtn = "an " + string;
-    else rtn= "a " + string;
+    } else {
+        rtn= "a " + string;
+    }
     return rtn;
 }
 
-int c_Config::fnPercent(int value, int percent) {
+int c_Config::fnPercent(int value, int percent)
+{
     //if ((percent >0) && (percent <= 100))
-        return (int)((float)value * ( (float)percent / 100.0 ) );
+    return (int)((float)value * ((float)percent / 100.0));
     //else
     //    return 0;
 }
 
-int c_Config::fnPercentOf(int value, int of) {
-        return (int)( ((float)value / (float)of) * 100.0 ) ;
+int c_Config::fnPercentOf(int value, int of)
+{
+    return (int)(((float)value / (float)of) * 100.0) ;
 }
 
 qulonglong c_Config::fnPercentOf(qulonglong value, qulonglong of)
 {
-    return (qulonglong)( ((double)value / (double)of) * 100.0 );
+    return (qulonglong)(((double)value / (double)of) * 100.0);
 }
 
 
 // signif cost (0.02%)
-int c_Config::fnRandTop(int value, int percent) {
+int c_Config::fnRandTop(int value, int percent)
+{
 
     // sanity
-    if (value < 2) return 0 ;
+    if (value < 2) {
+        return 0 ;
+    }
 
     int p  = c_Config::fnPercent(value, percent);
     int rp = c_Config::fnPercent(value, 100 - percent);

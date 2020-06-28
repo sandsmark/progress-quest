@@ -45,10 +45,11 @@ int Entity::Encumbrance()
 
 QString Entity::purchType()
 {
-    if (isNewPurchase)
+    if (isNewPurchase) {
         return "new";
-    else
+    } else {
         return "upgrade";
+    }
 }
 void Entity::setPurchNew(bool is_new)
 {
@@ -66,7 +67,7 @@ qulonglong Entity::maxXP()
     float bend = 20.0; // start bending at level
     float base = 1130.0; // xp at bend level
 
-    return (int)(base * pow(curvature, (Lv - bend)) );
+    return (int)(base * pow(curvature, (Lv - bend)));
     //2^64 = 1130 * 1.09512^(x - 20)
     //x = 430.85
 }
@@ -232,7 +233,7 @@ void Entity::load(QJsonObject entityRoot)
 QJsonArray Entity::spellListToArray(QList<c_Spell *> &list)
 {
     QJsonArray array;
-    for (int i=0; i < list.size(); i++){
+    for (int i=0; i < list.size(); i++) {
         array.append(list.at(i)->save());
     }
     return array;
@@ -241,8 +242,7 @@ QJsonArray Entity::spellListToArray(QList<c_Spell *> &list)
 QJsonArray Entity::itemListToArray(QList<c_Item *> &list)
 {
     QJsonArray array;
-    for (int i=0; i < list.size(); i++)
-    {
+    for (int i=0; i < list.size(); i++) {
         array.append(list.at(i)->save());
     }
     return array;
@@ -264,8 +264,7 @@ QJsonArray Entity::invListToArray(QList<c_Item *> &iList, QList<int> &nList)
 QList<c_Spell *> Entity::arrayToSpellList(QJsonArray array)
 {
     QList<c_Spell *> list;
-    for (int i=0; i < array.size(); i++)
-    {
+    for (int i=0; i < array.size(); i++) {
         list.append(new c_Spell);
         list.at(list.size() - 1)->load(array[i].toObject());
     }
@@ -275,8 +274,7 @@ QList<c_Spell *> Entity::arrayToSpellList(QJsonArray array)
 QList<c_Item *> Entity::arrayToItemList(QJsonArray array)
 {
     QList<c_Item *> list;
-    for (int i=0; i < array.size(); i++)
-    {
+    for (int i=0; i < array.size(); i++) {
         list.append(new c_Item);
         list.at(list.size() - 1)->load(array[i].toObject());
     }
@@ -288,8 +286,7 @@ void Entity::arrayToInvList(QJsonArray array, QList<c_Item *> &iList, QList<int>
     iList.clear();
     nList.clear();
 
-    for (int i=0; i < array.size(); i++)
-    {
+    for (int i=0; i < array.size(); i++) {
         QJsonArray pair = array[i].toArray();
 
         iList.append(new c_Item);

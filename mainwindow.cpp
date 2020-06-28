@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 
 // global super classes
-c_Config* gConfig;
-c_World* game;
+c_Config *gConfig;
+c_World *game;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow::initFrames();
 
     //set state must be after initPlayer (for canBuy.. to work)
-    if ( MainWindow::canBuyNewEq(Equipment::Any)) {
+    if (MainWindow::canBuyNewEq(Equipment::Any)) {
         game->currentState = State::BuyingNewEquipment;
     } else {
         game->currentState = State::HeadingToKillingFields;
@@ -80,21 +80,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::incr_pb_action_value()
 {
-    if (game->isDebugFlagSet(pq_debug_always_trigger_action))
+    if (game->isDebugFlagSet(pq_debug_always_trigger_action)) {
         ui->pb_action->setValue(99);
+    }
 
     int value = ui->pb_action->value();
-    if ( ++value < ui->pb_action->maximum())
-    {
+    if (++value < ui->pb_action->maximum()) {
         ui->pb_action->setValue(value);
-    }
-    else
-    {
+    } else {
         ui->pb_action->setValue(value % ui->pb_action->maximum());
 
-        switch(game->currentState) {
-        case State::Reserved1: break;
-        case State::HeadingToKillingFields: break;
+        switch (game->currentState) {
+        case State::Reserved1:
+            break;
+        case State::HeadingToKillingFields:
+            break;
         case State::Fighting:
             MainWindow::incr_pb_experience_value();
 
@@ -103,7 +103,8 @@ void MainWindow::incr_pb_action_value()
             MainWindow::incr_pb_encumbrance_value();
             MainWindow::addMonDrop();
             break;
-        case State::HeadingToTown: break;
+        case State::HeadingToTown:
+            break;
         case State::SellingOff:
             MainWindow::rmInvItem();
             MainWindow::incr_pb_encumbrance_value();
@@ -116,8 +117,9 @@ void MainWindow::incr_pb_action_value()
         MainWindow::transitionState();
     }
 
-    if (game->isDebugFlagSet(pq_debug_action_triggers_save))
+    if (game->isDebugFlagSet(pq_debug_action_triggers_save)) {
         MainWindow::gameSave();
+    }
 
     game->pb_action = ui->pb_action->value();
 }
@@ -125,7 +127,7 @@ void MainWindow::incr_pb_action_value()
 void MainWindow::incr_pb_encumbrance_value()
 {
     // get percent value of encumbrance
-    int value = int( ((float)game->Player->Encumbrance() / (float)game->Player->maxEncumbrance() * 100.0) );
+    int value = int(((float)game->Player->Encumbrance() / (float)game->Player->maxEncumbrance() * 100.0));
 
     // set value to bar
     ui->pb_encumbrance->setValue(value);
@@ -139,14 +141,11 @@ void MainWindow::incr_pb_plot_value()
     actName = "Act ";
 
     int value = ui->pb_plot->value() + (rand() % 6 + 1);
-    if ( value < ui->pb_plot->maximum())
-    {
+    if (value < ui->pb_plot->maximum()) {
         // progress plot
         ui->pb_plot->setValue(value);
 
-    }
-    else
-    {
+    } else {
         // completed plot act - add new one
 
         //      reset progress bar
@@ -172,14 +171,11 @@ void MainWindow::incr_pb_plot_value()
 void MainWindow::incr_pb_quest_value()
 {
     int value = ui->pb_quest->value() + (rand() % 4 + 1);
-    if ( value < ui->pb_quest->maximum())
-    {
+    if (value < ui->pb_quest->maximum()) {
         // progress quest
         ui->pb_quest->setValue(value);
 
-    }
-    else
-    {
+    } else {
         // completed quest - add new one
 
         //      reset progress bar
@@ -209,13 +205,10 @@ void MainWindow::incr_pb_experience_value()
         int value = (int)(gConfig->fnPercentOf(game->Player->XP.toULongLong(), game->Player->maxXP()));
 
         // is < 100% ?
-        if ( value < ui->pb_experience->maximum())
-        {
+        if (value < ui->pb_experience->maximum()) {
             ui->pb_experience->setValue(value);
 
-        }
-        else
-        {
+        } else {
             // level up
             //      incr level
             game->Player->incrLevel();
@@ -250,13 +243,13 @@ void MainWindow::initFrames()
 
     // traits
     for (int i = 0; i < gConfig->Traits.size(); i++) {
-        ui->tbl_traits->setItem(i, 0, new QTableWidgetItem( gConfig->Traits.at(i) ));
+        ui->tbl_traits->setItem(i, 0, new QTableWidgetItem(gConfig->Traits.at(i)));
     }
 
-    ui->tbl_traits->setItem(0, 1, new QTableWidgetItem( game->Player->Name ));
-    ui->tbl_traits->setItem(1, 1, new QTableWidgetItem( game->Player->Race ));
-    ui->tbl_traits->setItem(2, 1, new QTableWidgetItem( game->Player->Voc ));
-    ui->tbl_traits->setItem(3, 1, new QTableWidgetItem( game->Player->Level ));
+    ui->tbl_traits->setItem(0, 1, new QTableWidgetItem(game->Player->Name));
+    ui->tbl_traits->setItem(1, 1, new QTableWidgetItem(game->Player->Race));
+    ui->tbl_traits->setItem(2, 1, new QTableWidgetItem(game->Player->Voc));
+    ui->tbl_traits->setItem(3, 1, new QTableWidgetItem(game->Player->Level));
     ui->tbl_traits->resizeColumnsToContents();
 
 
@@ -279,9 +272,7 @@ void MainWindow::initFrames()
         ui->lst_plot->currentItem()->setCheckState(Qt::Checked);
         game->Act++;
         MainWindow::addAct();
-    }
-    else
-    {
+    } else {
         /*
             If loaded with value higher from old save
             this will just start the list from last Act.
@@ -315,16 +306,21 @@ QString MainWindow::randQuest()
 
     c_Item special;
 
-    switch(randQuest) {
+    switch (randQuest) {
 
     case 1:
         // Hunt quest
 
         //      preamble
         switch (rand() % 3) {
-        case 1:  rtnQuest += "Quell the "; break;
-        case 2:  rtnQuest += "Placate the "; break;
-        default: rtnQuest += "Hunt the ";
+        case 1:
+            rtnQuest += "Quell the ";
+            break;
+        case 2:
+            rtnQuest += "Placate the ";
+            break;
+        default:
+            rtnQuest += "Hunt the ";
         }
 
         //      object
@@ -337,10 +333,17 @@ QString MainWindow::randQuest()
 
         //      preable
         switch (rand() % 4) {
-        case 1:  rtnQuest += "Deliver this "; break;
-        case 2:  rtnQuest += "Collect payment for this "; break;
-        case 3:  rtnQuest += "Hide this "; break;
-        default: rtnQuest += "Fetch my ";
+        case 1:
+            rtnQuest += "Deliver this ";
+            break;
+        case 2:
+            rtnQuest += "Collect payment for this ";
+            break;
+        case 3:
+            rtnQuest += "Hide this ";
+            break;
+        default:
+            rtnQuest += "Fetch my ";
         }
 
         //      object
@@ -353,9 +356,14 @@ QString MainWindow::randQuest()
 
         //      preamble
         switch (rand() % 3) {
-        case 1:  rtnQuest += "Inquire after the "; break;
-        case 2:  rtnQuest += "Aspire for the "; break;
-        default: rtnQuest += "Seek the ";
+        case 1:
+            rtnQuest += "Inquire after the ";
+            break;
+        case 2:
+            rtnQuest += "Aspire for the ";
+            break;
+        default:
+            rtnQuest += "Seek the ";
         }
 
         //      object
@@ -379,7 +387,7 @@ void MainWindow::addQuest(QString name)
     //game->quests.push_back(name);
 
     // add to quests listbox
-    ui->lst_quests->addItem(new QListWidgetItem ());
+    ui->lst_quests->addItem(new QListWidgetItem());
     ui->lst_quests->setCurrentRow(ui->lst_quests->count() - 1);
     ui->lst_quests->currentItem()->setText(name);
     ui->lst_quests->currentItem()->setCheckState(Qt::PartiallyChecked);
@@ -391,14 +399,12 @@ void MainWindow::addAct()
 
     if (game->Act == 0) {
         actName = "Prologue";
-    }
-    else
-    {
+    } else {
         actName =  "Act ";
         actName += gConfig->toRoman(game->Act);
     }
 
-    ui->lst_plot->addItem(new QListWidgetItem ());
+    ui->lst_plot->addItem(new QListWidgetItem());
     ui->lst_plot->setCurrentRow(ui->lst_plot->count() - 1);
     ui->lst_plot->currentItem()->setText(actName);
     ui->lst_plot->currentItem()->setCheckState(Qt::PartiallyChecked);
@@ -407,7 +413,7 @@ void MainWindow::addAct()
 void MainWindow::setAction()
 {
     game->Action.clear();
-    switch(game->currentState) {
+    switch (game->currentState) {
     case State::Reserved1:
         // reserved
         break;
@@ -421,7 +427,7 @@ void MainWindow::setAction()
         // fight
         MainWindow::setMonster();
         game->Action = tr("Executing ") +\
-                gConfig->Indefinite(game->Monster->Discription());
+                       gConfig->Indefinite(game->Monster->Discription());
         game->actionTime = 50;
         break;
     case State::HeadingToTown:
@@ -437,16 +443,20 @@ void MainWindow::setAction()
     case State::BuyingNewEquipment:
         // shopping!!
         game->Action = tr("Negotiating purchase of ") +
-                game->Player->purchType() +tr(" ") +
-                game->Player->Purchase->Name() + tr(" ");
+                       game->Player->purchType() +tr(" ") +
+                       game->Player->Purchase->Name() + tr(" ");
         switch (game->Player->Purchase->Type()) {
         case Equipment::Weapon:
-            game->Action += tr("(weapon)"); break;
+            game->Action += tr("(weapon)");
+            break;
         case Equipment::Shield:
-            game->Action += tr("(shield)"); break;
+            game->Action += tr("(shield)");
+            break;
         case Equipment::Armoy:
-            game->Action += tr("(armor)"); break;
-        case Equipment::Any: break;
+            game->Action += tr("(armor)");
+            break;
+        case Equipment::Any:
+            break;
         }
         game->actionTime = 35;
         break;
@@ -457,10 +467,11 @@ void MainWindow::setAction()
 
     // update final conditions
     ui->lbl_action->setText(game->Action);
-    if (game->isDebugFlagSet(pq_debug_zero_action_timer))
+    if (game->isDebugFlagSet(pq_debug_zero_action_timer)) {
         pb_action_timer->setInterval(1);
-    else
+    } else {
         pb_action_timer->setInterval(game->actionTime);
+    }
 }
 
 void MainWindow::transitionState()
@@ -473,23 +484,26 @@ void MainWindow::transitionState()
         game->currentState = State::Fighting;
         break;
     case State::Fighting:
-        if (game->Player->Encumbrance() > game->Player->maxEncumbrance())
+        if (game->Player->Encumbrance() > game->Player->maxEncumbrance()) {
             game->currentState = State::HeadingToTown;
+        }
         break;
     case State::HeadingToTown:
         game->currentState = State::SellingOff;
         break;
     case State::SellingOff:
         if (game->Player->Inventory.empty()) {
-            if (MainWindow::canBuyNewEq(Equipment::Any))
+            if (MainWindow::canBuyNewEq(Equipment::Any)) {
                 game->currentState = State::BuyingNewEquipment;
-            else
+            } else {
                 game->currentState = State::HeadingToKillingFields;
+            }
         }
         break;
     case State::BuyingNewEquipment:
-        if (! MainWindow::canBuyNewEq(Equipment::Any))
+        if (! MainWindow::canBuyNewEq(Equipment::Any)) {
             game->currentState = State::HeadingToKillingFields;
+        }
         break;
     case State::InterplotCinematic:
         if (game->interplotCinematic.isEmpty()) {
@@ -510,27 +524,30 @@ void MainWindow::setMonster()
     // determine monster level from player's
     int Lv = game->Player->Level.toInt();
     Lv = Lv - (rand() % 10); // reduce monster lv up to -9 levels
-    if (Lv < 0) Lv = 0; // no less than 0
+    if (Lv < 0) {
+        Lv = 0;    // no less than 0
+    }
 
     // fill out monster
     do {
         game->Monster->clear();
 
-        if (    game->Monster->makeByLevel(Lv) ||
+        if (game->Monster->makeByLevel(Lv) ||
                 game->Monster->makeMounted(Lv) ||
                 game->Monster->makeGroup(Lv)
-           )
+           ) {
             success = true;
+        }
     } while (! success); // potential infinite
 }
 
 void MainWindow::addMonDrop()
 {
 
-    c_Item* drop;
+    c_Item *drop;
 
     // traverse all drop for this monster
-    for(int i(0); i < game->Monster->Drops().size(); i++) {
+    for (int i(0); i < game->Monster->Drops().size(); i++) {
 
         drop = new c_Item;
         bool found(false);
@@ -539,17 +556,17 @@ void MainWindow::addMonDrop()
         drop->setName(game->Monster->Drops().at(i));
         drop->Weight = 1;
         drop->setType(Equipment::Any);
-        if (game->Monster->Level().toInt() < 0)
+        if (game->Monster->Level().toInt() < 0) {
             drop->setPrice(0);
-        else
+        } else {
             drop->setPrice(game->Monster->Level().toInt());
+        }
 
         // if found in inventory (match name and price), add another
-        for(int t = 0; t < game->Player->Inventory.size(); t++) {
-            if ( game->Player->Inventory.at(t)->Name() == drop->Name() &&
+        for (int t = 0; t < game->Player->Inventory.size(); t++) {
+            if (game->Player->Inventory.at(t)->Name() == drop->Name() &&
                     game->Player->Inventory.at(t)->Appraisal() == drop->Appraisal()
-                 )
-            {
+               ) {
                 game->Player->Quantity[t] = game->Player->Quantity.at(t) + 1;
                 ui->tbl_inventory->setCurrentCell(t+1, 1);
                 found = true;
@@ -568,7 +585,9 @@ void MainWindow::addMonDrop()
     if ((game->Monster->isSpecial) && (rand() % 3 == 0)) {
         drop = new c_Item;
         drop->makeSpecial();
-        if (rand() % 2 == 0) drop->addAdjMod();
+        if (rand() % 2 == 0) {
+            drop->addAdjMod();
+        }
         game->Player->Inventory.append(drop);
         game->Player->Quantity.append(1);
         ui->tbl_inventory->setCurrentCell(ui->tbl_inventory->rowCount(), 1);
@@ -603,10 +622,11 @@ QString MainWindow::sellInvItem()
     // build a return: "q whatever[s] for n gold"
     build = QString().number(game->Player->Quantity.last()) + tr(" ");
 
-    if (game->Player->Quantity.last() > 1)
+    if (game->Player->Quantity.last() > 1) {
         build += gConfig->sufPlural(game->Player->Inventory.last()->Name()) + tr(" ");
-    else
+    } else {
         build += game->Player->Inventory.last()->Name() + tr(" ");
+    }
 
     build += tr("for ") + QString().number(saleValue) + tr(" gold");
 
@@ -617,27 +637,27 @@ void MainWindow::winStats()
 {
     int stat_bonus = rand() % 4 + 4;
     do {
-        if ( (rand() % 3 == 0) && (stat_bonus > 0) ) {
+        if ((rand() % 3 == 0) && (stat_bonus > 0)) {
             game->Player->STR = game->Player->STR.number(game->Player->STR.toInt() + 1);
             stat_bonus--;
         }
-        if ( (rand() % 3 == 0) && (stat_bonus > 0) ) {
+        if ((rand() % 3 == 0) && (stat_bonus > 0)) {
             game->Player->INT = game->Player->INT.number(game->Player->INT.toInt() + 1);
             stat_bonus--;
         }
-        if ( (rand() % 3 == 0) && (stat_bonus > 0) ) {
+        if ((rand() % 3 == 0) && (stat_bonus > 0)) {
             game->Player->WIS = game->Player->WIS.number(game->Player->WIS.toInt() + 1);
             stat_bonus--;
         }
-        if ( (rand() % 3 == 0) && (stat_bonus > 0) ) {
+        if ((rand() % 3 == 0) && (stat_bonus > 0)) {
             game->Player->DEX = game->Player->DEX.number(game->Player->DEX.toInt() + 1);
             stat_bonus--;
         }
-        if ( (rand() % 3 == 0) && (stat_bonus > 0) ) {
+        if ((rand() % 3 == 0) && (stat_bonus > 0)) {
             game->Player->CON = game->Player->CON.number(game->Player->CON.toInt() + 1);
             stat_bonus--;
         }
-        if ( (rand() % 3 == 0) && (stat_bonus > 0) ) {
+        if ((rand() % 3 == 0) && (stat_bonus > 0)) {
             game->Player->CHA = game->Player->CHA.number(game->Player->CHA.toInt() + 1);
             stat_bonus--;
         }
@@ -651,12 +671,13 @@ void MainWindow::winStats()
 
 void MainWindow::winSpells()
 {
-    if (ui->tbl_spells->rowCount() >= gConfig->Spells.size())
-        return; // guard vs unneeded
+    if (ui->tbl_spells->rowCount() >= gConfig->Spells.size()) {
+        return;    // guard vs unneeded
+    }
 
     bool found = false;
 
-    c_Spell* spell = new c_Spell;
+    c_Spell *spell = new c_Spell;
 
     // incr current spell levels
     for (int i(0); i < game->Player->Spells.size(); i++) {
@@ -670,16 +691,19 @@ void MainWindow::winSpells()
 
     // find if new spell exists
     for (int i(0); i < game->Player->Spells.size(); i++) {
-        if (game->Player->Spells.at(i)->Name() == spell->Name())
+        if (game->Player->Spells.at(i)->Name() == spell->Name()) {
             found = true;
+        }
     }
 
     // discard if found
-    if (found)
+    if (found) {
         delete spell;
-    else
+    } else
         //add to list
+    {
         game->Player->Spells.append(spell);
+    }
 
     MainWindow::updSpellTbl();
 }
@@ -692,31 +716,33 @@ bool MainWindow::canBuyNewEq(Equipment eqtype)
     return (game->Player->Purchase->Appraisal() <= spendCap);
 }
 
-c_Item* MainWindow::getPurchaseItem(Equipment eqtype)
+c_Item *MainWindow::getPurchaseItem(Equipment eqtype)
 {
-    c_Item* itemForPurchase{};
+    c_Item *itemForPurchase{};
     Equipment eqSelect = eqtype;
     int pick(0);
 
     // randomize "any" type to weapon, shield, or armor
     if (eqtype == Equipment::Any) {
         int r = rand() % 11; // total peices of eq
-        if      (r == 0) eqSelect = Equipment::Weapon;
-        else if (r == 1) eqSelect = Equipment::Shield;
-        else eqSelect = Equipment::Armoy;
+        if (r == 0) {
+            eqSelect = Equipment::Weapon;
+        } else if (r == 1) {
+            eqSelect = Equipment::Shield;
+        } else {
+            eqSelect = Equipment::Armoy;
+        }
     }
 
     // set item to purchase (slot used for armor slots)
-    switch(eqSelect) {
+    switch (eqSelect) {
 
     case Equipment::Weapon:
         // if not filled - buy first one
-        if (game->Player->Weapon->Name() == tr("") ) {
+        if (game->Player->Weapon->Name() == tr("")) {
             itemForPurchase = game->makeEqByGrade(eqSelect, -4);
             game->Player->setPurchNew(true);
-        }
-        else
-        {
+        } else {
             // upgrade
             itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Weapon->Grade());
             game->Player->setPurchNew(false);
@@ -727,9 +753,7 @@ c_Item* MainWindow::getPurchaseItem(Equipment eqtype)
         if (game->Player->Shield->Name() == tr("")) {
             itemForPurchase = game->makeEqByGrade(Equipment::Shield, game->Player->Level.toInt());
             game->Player->setPurchNew(true);
-        }
-        else
-        {
+        } else {
             itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Shield->Grade());
             game->Player->setPurchNew(false);
         }
@@ -739,13 +763,11 @@ c_Item* MainWindow::getPurchaseItem(Equipment eqtype)
         // pick random armor
         pick = rand() % game->Player->Armor.size();
 
-        if (game->Player->Armor.at(pick)->Name() == tr("")){
+        if (game->Player->Armor.at(pick)->Name() == tr("")) {
             itemForPurchase = game->makeEqByGrade(Equipment::Armoy, game->Player->Level.toInt());
             itemForPurchase->setASlot(pick);
             game->Player->setPurchNew(true);
-        }
-        else
-        {
+        } else {
             itemForPurchase = MainWindow::upgradeEq(eqSelect, game->Player->Armor.at(pick)->Grade());
             itemForPurchase->setASlot(pick);
             game->Player->setPurchNew(false);
@@ -764,7 +786,7 @@ void MainWindow::buyNewEq()
     game->Player->Gold -= game->Player->Purchase->Appraisal();
 
     // drop old and equip new
-    switch(game->Player->Purchase->Type()) {
+    switch (game->Player->Purchase->Type()) {
     case Equipment::Weapon:
         delete game->Player->Weapon;
         game->Player->Weapon = game->Player->Purchase;
@@ -789,13 +811,14 @@ void MainWindow::buyNewEq()
 }
 
 
-c_Item* MainWindow::upgradeEq(Equipment eqtype, int grade)
+c_Item *MainWindow::upgradeEq(Equipment eqtype, int grade)
 {
-    c_Item* equip = new c_Item;
+    c_Item *equip = new c_Item;
     Equipment eqSelect = eqtype;
 
-    if (eqSelect == Equipment::Any)
+    if (eqSelect == Equipment::Any) {
         eqSelect = Equipment(rand() % 3);
+    }
 
     switch (eqSelect) {
     case Equipment::Weapon:
@@ -819,20 +842,20 @@ void MainWindow::updInvTbl()
     ui->tbl_inventory->setRowCount(1 + game->Player->Inventory.size());
 
     // gold first
-    ui->tbl_inventory->setItem(0, 0, new QTableWidgetItem("Gold") );
-    ui->tbl_inventory->setItem(0, 1, new QTableWidgetItem(QString::number(game->Player->Gold)) );
+    ui->tbl_inventory->setItem(0, 0, new QTableWidgetItem("Gold"));
+    ui->tbl_inventory->setItem(0, 1, new QTableWidgetItem(QString::number(game->Player->Gold)));
 
     // remaining inv list
     for (int i(0); i < game->Player->Inventory.size(); i++) {
-        ui->tbl_inventory->setItem(i+1, 0, new QTableWidgetItem(game->Player->Inventory.at(i)->Name()) );
-        ui->tbl_inventory->setItem(i+1, 1, new QTableWidgetItem(QString::number(game->Player->Quantity.at(i))) );
+        ui->tbl_inventory->setItem(i+1, 0, new QTableWidgetItem(game->Player->Inventory.at(i)->Name()));
+        ui->tbl_inventory->setItem(i+1, 1, new QTableWidgetItem(QString::number(game->Player->Quantity.at(i))));
     }
 
     ui->tbl_inventory->resizeColumnsToContents();
 
-    ui->lbl_inventory->setText( tr("Inventory ") +\
-                                QString::number(game->Player->Encumbrance()) +\
-                                tr(" units") );
+    ui->lbl_inventory->setText(tr("Inventory ") +\
+                               QString::number(game->Player->Encumbrance()) +\
+                               tr(" units"));
 }
 
 
@@ -845,12 +868,12 @@ void MainWindow::updEquipTbl()
     // reload equipment from Player and config
     ui->tbl_equipment->setRowCount(gConfig->Equips.size());
     for (int i = 0; i < gConfig->Equips.size(); i++) {
-        ui->tbl_equipment->setItem( i, 0, new QTableWidgetItem(gConfig->Equips.at(i)) );
+        ui->tbl_equipment->setItem(i, 0, new QTableWidgetItem(gConfig->Equips.at(i)));
     }
-    ui->tbl_equipment->setItem(0, 1, new QTableWidgetItem(game->Player->Weapon->Name()) );
-    ui->tbl_equipment->setItem(1, 1, new QTableWidgetItem(game->Player->Shield->Name()) );
+    ui->tbl_equipment->setItem(0, 1, new QTableWidgetItem(game->Player->Weapon->Name()));
+    ui->tbl_equipment->setItem(1, 1, new QTableWidgetItem(game->Player->Shield->Name()));
     for (int i(0); i < game->Player->Armor.size(); i++) {
-         ui->tbl_equipment->setItem(i + 2, 1, new QTableWidgetItem(game->Player->Armor.at(i)->Name()) );
+        ui->tbl_equipment->setItem(i + 2, 1, new QTableWidgetItem(game->Player->Armor.at(i)->Name()));
     }
 
     ui->tbl_equipment->resizeColumnsToContents();
@@ -890,8 +913,8 @@ void MainWindow::updSpellTbl()
     // spell list
     ui->tbl_spells->setRowCount(game->Player->Spells.size());
     for (int i = 0; i < game->Player->Spells.size(); i++) {
-        ui->tbl_spells->setItem( i, 0, new QTableWidgetItem(game->Player->Spells.at(i)->Name()) );
-        ui->tbl_spells->setItem( i, 1, new QTableWidgetItem(game->Player->Spells.at(i)->Level()) );
+        ui->tbl_spells->setItem(i, 0, new QTableWidgetItem(game->Player->Spells.at(i)->Name()));
+        ui->tbl_spells->setItem(i, 1, new QTableWidgetItem(game->Player->Spells.at(i)->Level()));
     }
 
     ui->tbl_spells->resizeColumnsToContents();
@@ -973,8 +996,7 @@ void MainWindow::updateQuestList()
     if (game->quests.size() > 0) {
         // handle full quests list in game data
         MainWindow::addQuest(game->quests.at(0)); // prime the list
-        for (int i=1; i < game->quests.size(); i++)
-        {
+        for (int i=1; i < game->quests.size(); i++) {
             //      check last item in list
             ui->lst_quests->setCurrentRow(ui->lst_quests->count() - 1);
             ui->lst_quests->currentItem()->setCheckState(Qt::Checked);
@@ -990,7 +1012,7 @@ void MainWindow::updateQuestList()
 }
 
 
-void MainWindow::keyPressEvent(QKeyEvent * k)
+void MainWindow::keyPressEvent(QKeyEvent *k)
 {
     /*
      *      QT 4.8 Docs specify that unhandled keys must be
@@ -1008,29 +1030,28 @@ void MainWindow::keyPressEvent(QKeyEvent * k)
         }
 
         // we are already in debug mode
-        if(k->key() == Qt::Key_R) {  // reset debug - without losing mode
+        if (k->key() == Qt::Key_R) { // reset debug - without losing mode
             game->debugActive();
             return;
         }
 
-        if(k->key() == Qt::Key_0) {  // toggle zero action time
+        if (k->key() == Qt::Key_0) { // toggle zero action time
             game->toggleDebugFlag(pq_debug_zero_action_timer);
             return;
         }
 
-        if(k->key() == Qt::Key_S) { // toggle save on action
+        if (k->key() == Qt::Key_S) { // toggle save on action
             game->toggleDebugFlag(pq_debug_action_triggers_save);
             return;
         }
 
-        if(k->key() == Qt::Key_A) { // toggle always trigger action
+        if (k->key() == Qt::Key_A) { // toggle always trigger action
             game->toggleDebugFlag(pq_debug_always_trigger_action);
             return;
         }
     } else {
         // not in debug mode - yet
-        if (k->key() == Qt::Key_Escape)
-        {
+        if (k->key() == Qt::Key_Escape) {
             // activate debug
             game->debugActive();
             ui->lbl_char->setText("Character Sheet [debug mode]");

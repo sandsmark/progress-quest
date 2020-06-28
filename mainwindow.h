@@ -17,14 +17,15 @@
 #include "dialog_opening.h"
 #include <QMainWindow>
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -53,7 +54,7 @@ private:
     void buyNewEq();
     bool canBuyNewEq(Equipment eqtype);
     c_Item *getPurchaseItem(Equipment eqtype);
-    c_Item* upgradeEq(Equipment eqtype , int grade);
+    c_Item *upgradeEq(Equipment eqtype, int grade);
 
     void winStats();
     void winSpells();
@@ -68,7 +69,7 @@ private:
     void transitionState();
 
     // key responder reimplementation
-    void keyPressEvent(QKeyEvent * k);
+    void keyPressEvent(QKeyEvent *k);
 
     // timer drive
     QTimer *pb_action_timer;
@@ -82,7 +83,7 @@ public slots:
 
     void gameSave();
     //void gameLoad();
-\
+    \
     void setAction();
 };
 

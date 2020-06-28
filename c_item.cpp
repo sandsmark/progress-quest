@@ -29,13 +29,15 @@ QString c_Item::Name()
 
     // start with bonus
     if (itemBonus != 0) {
-        if (itemBonus > 0) rtn += "+";
+        if (itemBonus > 0) {
+            rtn += "+";
+        }
         rtn += QString().number(itemBonus);
         rtn += " ";
     }
 
     // apply prefix modifiers
-    for(int i = 0; i < modifiers.size(); i++) {
+    for (int i = 0; i < modifiers.size(); i++) {
         if (modprefix.at(i)) {
             rtn += modifiers.at(i);
             rtn += " ";
@@ -46,7 +48,7 @@ QString c_Item::Name()
     rtn += basename;
 
     // apply postfix mods
-    for(int i = 0; i < modifiers.size(); i++) {
+    for (int i = 0; i < modifiers.size(); i++) {
         if (! modprefix.at(i)) {
             rtn += " ";
             rtn += modifiers.at(i);
@@ -86,19 +88,28 @@ int c_Item::Appraisal()
             factor = 3;
         }
         // factor by grade
-        else if (g < 20)    factor = 7;
-        else if (g < 50)    factor = 5;
-        else if (g < 100)   factor = 3;
-        else                factor = 1;
+        else if (g < 20) {
+            factor = 7;
+        } else if (g < 50) {
+            factor = 5;
+        } else if (g < 100) {
+            factor = 3;
+        } else {
+            factor = 1;
+        }
 
         // factor by type (any = by grade only)
 //        if      (itemType == pq_equip_weapon) factor += 8;
 //        else if (itemType == pq_equip_shield) factor += 6;
 //        else if (itemType == pq_equip_armor)  factor += 7;
 
-        if      (itemType == Equipment::Weapon) factor += 18;
-        else if (itemType == Equipment::Shield) factor += 26;
-        else if (itemType == Equipment::Armoy)  factor += 22;
+        if (itemType == Equipment::Weapon) {
+            factor += 18;
+        } else if (itemType == Equipment::Shield) {
+            factor += 26;
+        } else if (itemType == Equipment::Armoy) {
+            factor += 22;
+        }
 
         // set price
         price = g * factor;
@@ -121,7 +132,7 @@ int c_Item::Grade()
     g += basegrade;
 
     // assess mods
-    for(int i(0); i < modgrades.size(); i++) {
+    for (int i(0); i < modgrades.size(); i++) {
         //g += (float)g * ((float)modgrades.at(i)/5.0) ;
         g += modgrades.at(i);
     }
@@ -257,7 +268,7 @@ void c_Item::addAdjMod()
 
 void c_Item::makeClosestGrade(Equipment iType, int grade)
 {
-    QStringList* itemList;
+    QStringList *itemList;
     Equipment eqSelect = iType;
 
     // handle "any" selection
@@ -266,7 +277,7 @@ void c_Item::makeClosestGrade(Equipment iType, int grade)
     }
 
     // choose list by type
-    switch(eqSelect) {
+    switch (eqSelect) {
     case Equipment::Weapon:
         itemList = &gConfig->Weapons;
         break;
@@ -294,11 +305,11 @@ void c_Item::makeClosestGrade(Equipment iType, int grade)
         if (curGrade == grade) {
             found = true;
             listFound.append(cdata.at(0)); // add name
-        }
-        else
-        {
+        } else {
             // prime lastDiff (make larger than 0)
-            if (lastDiff == 0) lastDiff = abs(grade - curGrade);
+            if (lastDiff == 0) {
+                lastDiff = abs(grade - curGrade);
+            }
 
             // find closest grade
             if (abs(grade - curGrade) <= lastDiff) {
@@ -311,20 +322,23 @@ void c_Item::makeClosestGrade(Equipment iType, int grade)
     } while (index < itemList->size());
 
     // no exact grades found
-    if (! found)
-    {
+    if (! found) {
         // use closest grade - find all -> listFound
         for (index=0; index < itemList->size(); index++) {
             cdata = itemList->at(index).split("|");
-            if (cdata.at(1).toInt() == closestGrade)
+            if (cdata.at(1).toInt() == closestGrade) {
                 listFound.append(cdata.at(0));
+            }
         }
     }
 
     // randomize from names list (closest or exact)
     basename = listFound.at(rand() % listFound.size());
-    if (found) basegrade = grade;
-    else basegrade = closestGrade;
+    if (found) {
+        basegrade = grade;
+    } else {
+        basegrade = closestGrade;
+    }
     Weight = 1;
     itemType = eqSelect;
 
@@ -358,7 +372,7 @@ void c_Item::load(QJsonObject itemRoot)
                            modifiers,
                            modprefix,
                            modgrades
-                           );
+                          );
     itemBonus = itemRoot["Bonus"].toInt();
     price = itemRoot["Price"].toInt();
     armorSlot = itemRoot["ArmorSlot"].toInt();

@@ -44,7 +44,7 @@ public:
     void load(QJsonObject monsterRoot);
 
 signals:
-    
+
 public slots:
 
 private:

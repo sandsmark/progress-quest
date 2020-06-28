@@ -23,7 +23,7 @@ class QGroupBox;
 class Dialog_charSheet : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit Dialog_charSheet(QWidget *parent = nullptr);
     ~Dialog_charSheet();
@@ -55,7 +55,7 @@ private:
 
     QLineEdit *m_nameEdit;
 
-    QMap<QString, QLineEdit*> m_statsEdits;
+    QMap<QString, QLineEdit *> m_statsEdits;
     QLineEdit *m_totalStatCount;
 
     QStack<QMap<QString, int>> m_rollHistory;

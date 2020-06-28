@@ -47,7 +47,7 @@ QString c_Monster::Discription()
         build = monster_race; // basename
 
         // apply mod list
-        for (int i(0); i < mods.size(); i++){
+        for (int i(0); i < mods.size(); i++) {
             build = gConfig->fnInterpStr(mods.at(i), build);
         }
 
@@ -61,7 +61,7 @@ QString c_Monster::Level()
 {
     if (level == tr("")) {
         int build = monster_level;
-        for(int i = 0; i < mod_values.size(); i++) {
+        for (int i = 0; i < mod_values.size(); i++) {
             build += mod_values.at(i);
         }
         level = QString().number(build);
@@ -83,11 +83,12 @@ qulonglong c_Monster::winXP()
         float factor = 17;
 
         // special bonus
-        if (isSpecial)
-            base_xp +=  5.0; // careful
+        if (isSpecial) {
+            base_xp +=  5.0;    // careful
+        }
 
         awardXP = (qulonglong)
-                (base_xp + (pow(lv,2.0) / pow(factor,2.0)) );
+                  (base_xp + (pow(lv,2.0) / pow(factor,2.0)));
     }
 
     return awardXP;
@@ -96,10 +97,11 @@ qulonglong c_Monster::winXP()
 QStringList c_Monster::Drops()
 {
     if (! dropsFormatted) {
-        for(int i(0); i < drops.size(); i++) {
+        for (int i(0); i < drops.size(); i++) {
             // handle special drops
-            if (drops.at(i) == tr("*"))
+            if (drops.at(i) == tr("*")) {
                 drops[i] = gConfig->MonSpcDrop.at(rand() % gConfig->MonSpcDrop.size());
+            }
 
 
             //if (! isMounted && ! isGroup) // preformatted
@@ -121,10 +123,18 @@ void c_Monster::makeRandMonster()
     drops.append(cdata.at(2));
 
     // total range of mods for level displacement -20..+20
-    if (rand() % 3 == 0) c_Monster::addAge(); // -5..+5
-    if (rand() % 3 == 0) c_Monster::addHealth(); // -5..+5
-    if (rand() % 3 == 0) c_Monster::addCast(); // -5..+5
-    if (rand() % 3 == 0) c_Monster::addSize(); // -5..+5
+    if (rand() % 3 == 0) {
+        c_Monster::addAge();    // -5..+5
+    }
+    if (rand() % 3 == 0) {
+        c_Monster::addHealth();    // -5..+5
+    }
+    if (rand() % 3 == 0) {
+        c_Monster::addCast();    // -5..+5
+    }
+    if (rand() % 3 == 0) {
+        c_Monster::addSize();    // -5..+5
+    }
 
     // special - can increase levels drastically (up to +150?)
     //if (rand() % 10 == 0) c_Monster::makeSpecial();
@@ -186,7 +196,7 @@ QStringList c_Monster::pickSpcByLevel(int level)
     finds.clear();
 
     // traverse all specials
-    for(int i(0); i < gConfig->MonSpecial.size(); i++) {
+    for (int i(0); i < gConfig->MonSpecial.size(); i++) {
 
         curSpcLevel = gConfig->MonSpecial.at(i).split("|").at(1).toInt();
         curLv = monster_level + curSpcLevel;
@@ -194,9 +204,7 @@ QStringList c_Monster::pickSpcByLevel(int level)
         //exact match
         if (level - curLv == 0) {
             finds.append(gConfig->MonSpecial.at(i)); // add to finds
-        }
-        else
-        {
+        } else {
             // if closer record and go on
             if (abs(level - curLv) < closestDiff) {
                 closestDiff = abs(level - curLv);
@@ -207,9 +215,11 @@ QStringList c_Monster::pickSpcByLevel(int level)
 
     // no exacts found - do closest matchs
     if (finds.empty()) {
-        for(int i(0); i < gConfig->MonSpecial.size(); i++) {
+        for (int i(0); i < gConfig->MonSpecial.size(); i++) {
             curSpcLevel = gConfig->MonSpecial.at(i).split("|").at(1).toInt();
-            if (curSpcLevel == closestFind) finds.append(gConfig->MonSpecial.at(i));
+            if (curSpcLevel == closestFind) {
+                finds.append(gConfig->MonSpecial.at(i));
+            }
         }
     }
 
@@ -235,20 +245,34 @@ bool c_Monster::makeByLevel(int level)
 
         // random chance of special monster - incr with level
         chanceSpc = 10 - (level / 10);
-        if (chanceSpc < 2) chanceSpc = 1; // 50% at lv 90+
-        if (rand() % chanceSpc == 0) c_Monster::makeSpecial(level);
+        if (chanceSpc < 2) {
+            chanceSpc = 1;    // 50% at lv 90+
+        }
+        if (rand() % chanceSpc == 0) {
+            c_Monster::makeSpecial(level);
+        }
 
         // total range of mods for level displacement -20..+20
-        if (rand() % 3 == 0) c_Monster::addAge(); // -5..+5
-        if (rand() % 3 == 0) c_Monster::addHealth(); // -5..+5
-        if (rand() % 3 == 0) c_Monster::addCast(); // -5..+5
-        if (rand() % 3 == 0) c_Monster::addSize(); // -5..+5
+        if (rand() % 3 == 0) {
+            c_Monster::addAge();    // -5..+5
+        }
+        if (rand() % 3 == 0) {
+            c_Monster::addHealth();    // -5..+5
+        }
+        if (rand() % 3 == 0) {
+            c_Monster::addCast();    // -5..+5
+        }
+        if (rand() % 3 == 0) {
+            c_Monster::addSize();    // -5..+5
+        }
         tryCount--;
-    } while ( (c_Monster::Level() != QString().number(level)) && (tryCount > 0) );
+    } while ((c_Monster::Level() != QString().number(level)) && (tryCount > 0));
 
-    if (c_Monster::Level() != QString().number(level))
-        return false; //fail
-    else return true; //success
+    if (c_Monster::Level() != QString().number(level)) {
+        return false;    //fail
+    } else {
+        return true;    //success
+    }
 
 }
 
@@ -263,7 +287,7 @@ bool c_Monster::makeLevelRange(int lowest_level, int highest_level)
     do {
         found = c_Monster::makeByLevel(i);
         i--;
-    } while ( (! found) && (i >= lowest_level) );
+    } while ((! found) && (i >= lowest_level));
 
     return found;
 }
@@ -273,7 +297,9 @@ bool c_Monster::makeMounted(int level)
     // trys to create a pair of monsters operating as a unit
 
     // sanity - blow off lowest levels
-    if (level < 3) return false;
+    if (level < 3) {
+        return false;
+    }
 
     int tryCount = 7;
     int lvTryCount = 50;
@@ -293,22 +319,24 @@ bool c_Monster::makeMounted(int level)
         // rand upper (abs) 1/2 of level
         lvRider = gConfig->fnRandTop(level, 50);
         lvMount = gConfig->fnRandTop(lvRider, 50);
-        if ( lvRider + lvMount == level )
+        if (lvRider + lvMount == level) {
             lvFound = true;
+        }
         lvTryCount--;
-    } while ( (! lvFound) && (lvTryCount > 0) );
+    } while ((! lvFound) && (lvTryCount > 0));
 
     // attempt to create by levels
     if (lvFound) {
         do {
-            if ( (rider.makeByLevel(lvRider))  &&
-                 (mount.makeByLevel(lvMount)) )
+            if ((rider.makeByLevel(lvRider))  &&
+                    (mount.makeByLevel(lvMount))) {
                 found = true;
+            }
             tryCount--;
-        } while ( (! found) && (tryCount > 0) );
+        } while ((! found) && (tryCount > 0));
 
         // construct mounted monster
-        if (found){
+        if (found) {
             c_Monster::clear();
             discription = rider.Discription() + tr(" mounted on a ") + mount.Discription();
             monster_race = tr("Mounted Monster");
@@ -333,7 +361,7 @@ bool c_Monster::makeMountedRange(int lowest_level, int highest_level)
     do {
         found = c_Monster::makeMounted(i);
         i--;
-    } while ( (! found) && (i >= lowest_level) );
+    } while ((! found) && (i >= lowest_level));
 
     return found;
 }
@@ -341,7 +369,9 @@ bool c_Monster::makeMountedRange(int lowest_level, int highest_level)
 bool c_Monster::makeGroup(int level)
 {
     // for my sanity - takes away nasty low level cases
-    if (level < 20) return false;
+    if (level < 20) {
+        return false;
+    }
 
     // trys to create a gang of monsters with combined level
     c_Monster minion;
@@ -356,10 +386,11 @@ bool c_Monster::makeGroup(int level)
     // the %200 limits level deprec at high levels
     lvLeader = gConfig->fnRandTop((level % 200), 50);
 
-    if (lvLeader < 4)
+    if (lvLeader < 4) {
         lvMinion = 1;
-    else
-        lvMinion = rand() % 3 + 1; // [1..3]
+    } else {
+        lvMinion = rand() % 3 + 1;    // [1..3]
+    }
 
     numOfMinions = (level - lvLeader) / lvMinion;
 
@@ -367,26 +398,28 @@ bool c_Monster::makeGroup(int level)
     // form group - by levels
     do {
         if (leader.makeByLevel(lvLeader))
-            if (minion.makeByLevel(lvMinion))
+            if (minion.makeByLevel(lvMinion)) {
                 found = true;
+            }
         tryCount--;
-    } while ( (! found) && (tryCount > 0) );
+    } while ((! found) && (tryCount > 0));
 
     if (found) {
         c_Monster::clear();
         if (numOfMinions < 2)
             discription = minion.Discription()+ tr(", traveling with ") +
-                    gConfig->Indefinite(leader.Discription());
+                          gConfig->Indefinite(leader.Discription());
         else
             discription = tr("group of ") + QString().number(numOfMinions) + tr(" ") +
-                    gConfig->sufPlural(minion.Discription()) + tr(", lead by ") +
-                    gConfig->Indefinite(leader.Discription());
+                          gConfig->sufPlural(minion.Discription()) + tr(", lead by ") +
+                          gConfig->Indefinite(leader.Discription());
 
         monster_race = tr("Monster Group");
         monster_level = leader.Level().toInt() + minion.Level().toInt() * numOfMinions;
         drops.append(leader.Drops());
-        for (int i(0); i < gConfig->fnPercent(numOfMinions, 80); i++)
-                drops.append(minion.Drops());
+        for (int i(0); i < gConfig->fnPercent(numOfMinions, 80); i++) {
+            drops.append(minion.Drops());
+        }
         dropsFormatted=true;
         isGroup = true;
         isSpecial = leader.isSpecial || minion.isSpecial;
@@ -468,8 +501,7 @@ void c_Monster::load(QJsonObject monsterRoot)
 QJsonArray c_Monster::modListToArray(QStringList &mList, QList<int> &vList)
 {
     QJsonArray array;
-    for (int i=0; i < mList.size(); i++)
-    {
+    for (int i=0; i < mList.size(); i++) {
         QJsonArray pair;
         pair.append(mList.at(i));
         pair.append(vList.at(i));
@@ -482,8 +514,7 @@ QJsonArray c_Monster::modListToArray(QStringList &mList, QList<int> &vList)
 QJsonArray c_Monster::dropListToArray(QStringList &list)
 {
     QJsonArray array;
-    for (int i=0; i < list.size(); i++)
-    {
+    for (int i=0; i < list.size(); i++) {
         array.append(list.at(i));
     }
     return array;
@@ -491,8 +522,7 @@ QJsonArray c_Monster::dropListToArray(QStringList &list)
 
 void c_Monster::arrayToModList(QJsonArray array, QStringList &mList, QList<int> &vList)
 {
-    for (int i=0; i < array.size(); i++)
-    {
+    for (int i=0; i < array.size(); i++) {
         QJsonArray pair = array[i].toArray();
         mList.append(pair[0].toString());
         vList.append(pair[1].toInt());
@@ -504,8 +534,7 @@ QStringList c_Monster::arrayToDropList(QJsonArray array)
     QStringList list;
     list.clear();
 
-    for(int i=0; i < array.size(); i++)
-    {
+    for (int i=0; i < array.size(); i++) {
         list.append(array[i].toString());
     }
     return list;

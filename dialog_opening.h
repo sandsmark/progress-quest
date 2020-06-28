@@ -9,18 +9,19 @@
 
 #include "c_world.h"
 
-namespace Ui {
+namespace Ui
+{
 class Dialog_Opening;
 }
 
 class Dialog_Opening : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit Dialog_Opening(QWidget *parent = 0);
     ~Dialog_Opening();
-    
+
 private:
     Ui::Dialog_Opening *ui;
 

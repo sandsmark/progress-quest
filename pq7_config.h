@@ -63,7 +63,7 @@ private:
 };
 
 //make gConfig to be an extern global
-extern c_Config* gConfig;
+extern c_Config *gConfig;
 
 
 #endif // PQ7_CONFIG_H

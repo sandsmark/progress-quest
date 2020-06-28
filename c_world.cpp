@@ -46,7 +46,7 @@ void c_World::initPlayer()
     Player->Shield = new c_Item;
 
     // add two starting armors (weak, random)
-    for(int i = 0; i < 9; i++) {
+    for (int i = 0; i < 9; i++) {
         Player->Armor.append(new c_Item);
     }
     // 2 *unique* armors - not the same one twice
@@ -64,7 +64,7 @@ void c_World::initPlayer()
     Player->Gold = 25;
 }
 
-c_Item* c_World::makeEqByGrade(Equipment eqtype, int grade)
+c_Item *c_World::makeEqByGrade(Equipment eqtype, int grade)
 /*
  *      Make Equipment By Grade
  *
@@ -76,25 +76,29 @@ c_Item* c_World::makeEqByGrade(Equipment eqtype, int grade)
  *  requested level (grade)
  */
 {
-    c_Item* equip = new c_Item;
+    c_Item *equip = new c_Item;
     Equipment eqSelect = eqtype;
 
     // handle "any" type
-    if (eqSelect == Equipment::Any)
+    if (eqSelect == Equipment::Any) {
         eqSelect = Equipment(rand() % 3);
+    }
 
     // main types
-    switch(eqSelect) {
+    switch (eqSelect) {
 
     case Equipment::Weapon:
 
         equip->makeClosestGrade(eqSelect, grade);
 
         // 2 possible mods, 50% chnc each: player level affects pos/neg
-        for(int i(0); i < 2; i++) {
+        for (int i(0); i < 2; i++) {
             if (rand() % 2 == 0) {
-                if (rand() % Player->Level.toInt() < 5) equip->addWeaponNegMod();
-                else equip->addWeaponMod();
+                if (rand() % Player->Level.toInt() < 5) {
+                    equip->addWeaponNegMod();
+                } else {
+                    equip->addWeaponMod();
+                }
             }
         }
 
@@ -108,10 +112,13 @@ c_Item* c_World::makeEqByGrade(Equipment eqtype, int grade)
         equip->makeClosestGrade(eqSelect, grade);
 
         // 2 possible mods, 50% chnc each: player level affects pos/neg
-        for(int i(0); i < 2; i++) {
+        for (int i(0); i < 2; i++) {
             if (rand() % 2 == 0) {
-                if (rand() % Player->Level.toInt() < 5) equip->addDefNegMod();
-                else equip->addDefMod();
+                if (rand() % Player->Level.toInt() < 5) {
+                    equip->addDefNegMod();
+                } else {
+                    equip->addDefMod();
+                }
             }
         }
 
@@ -125,10 +132,13 @@ c_Item* c_World::makeEqByGrade(Equipment eqtype, int grade)
         equip->makeClosestGrade(eqSelect, grade);
 
         // 2 possible mods, 50% chnc each: player level affects pos/neg
-        for(int i(0); i < 2; i++) {
+        for (int i(0); i < 2; i++) {
             if (rand() % 2 == 0) {
-                if (rand() % Player->Level.toInt() < 5) equip->addDefNegMod();
-                else equip->addDefMod();
+                if (rand() % Player->Level.toInt() < 5) {
+                    equip->addDefNegMod();
+                } else {
+                    equip->addDefMod();
+                }
             }
         }
 
@@ -212,7 +222,7 @@ void c_World::load(QString filename)
         //std::cerr << readSave.getFormatedErrorMessages();
         //exit (1);
         QMessageBox mBox;
-        mBox.setWindowTitle("JSON Parse fail on file " + filename );
+        mBox.setWindowTitle("JSON Parse fail on file " + filename);
         mBox.setText(error.errorString());
         mBox.exec();
         exit(1);
@@ -258,9 +268,8 @@ QStringList c_World::arrayToList(QJsonArray array)
     list.clear();
 
     // load json array to qstring list
-    for (int i=0; i < array.size(); i++)
-    {
-        list.append( array[i].toString() );
+    for (int i=0; i < array.size(); i++) {
+        list.append(array[i].toString());
     }
     return list;
 }
@@ -273,7 +282,7 @@ bool c_World::isDebugFlagSet(t_pq_debug flag)
 
 bool c_World::isDebugFlagReset(t_pq_debug flag)
 {
-    return ! (debug & flag);
+    return !(debug & flag);
 }
 
 void c_World::setDebugFlag(t_pq_debug flag)
@@ -288,10 +297,11 @@ void c_World::resetDebugFlag(t_pq_debug flag)
 
 void c_World::toggleDebugFlag(t_pq_debug flag)
 {
-    if (c_World::isDebugFlagReset(flag))
+    if (c_World::isDebugFlagReset(flag)) {
         c_World::setDebugFlag(flag);
-    else
+    } else {
         c_World::resetDebugFlag(flag);
+    }
 }
 
 void c_World::debugClear()
